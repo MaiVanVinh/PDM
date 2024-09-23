@@ -1,0 +1,31 @@
+CREATE TABLE user_Teacher(
+     id_teacher INT primary key,
+     username VARCHAR(20),
+     pass_word VARCHAR (20)
+  );   
+
+CREATE TABLE user_Student(
+     id_student INT primary key,
+     username VARCHAR(20),
+     pass_word VARCHAR (20)
+  );   
+
+
+CREATE TABLE class(
+     id_class INT primary key,
+     class_code VARCHAR(30) unique,
+     class_name VARCHAR(30),
+     pass_word VARCHAR (30),
+     teacher_id INT,
+     foreign key(teacher_id) references user_teacher(id_teacher)
+     ON DELETE CASCADE
+  );   
+  
+ INSERT INTO class(class_code,class_name,teacher_id) 
+ VALUES('ABC123','TOAN','1');
+
+INSERT INTO user_Teacher(username,pass_word)
+VALUES
+
+   ('thai', 'thai123')
+;
