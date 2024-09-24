@@ -9,6 +9,8 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import loadRes.LoadCreatedClass;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,10 +38,18 @@ public class SignIn_Window extends JFrame {
 
 	private static final long serialVersionUID = 1L;
     public static boolean checkUsername = false;
+    
+    private String id;
 	private JPanel contentPane;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
+	private JComboBox<String> comboBox;
+	private JCheckBox showPass;
+	
+	
     private Teacher_UI teacher_UI;
+    private LoadCreatedClass getCreatedClass;
+    
     
     
 	public SignIn_Window(MainMenu mainmenu) {
@@ -51,8 +61,9 @@ public class SignIn_Window extends JFrame {
 			e.printStackTrace();
 		}
 		 
+		getCreatedClass = new LoadCreatedClass();
 		teacher_UI = new Teacher_UI(this);
-		teacher_UI.setVisible(false);
+		teacher_UI.frame.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 530, 353);
@@ -61,7 +72,7 @@ public class SignIn_Window extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JComboBox<String> comboBox = new JComboBox<>();
+		comboBox = new JComboBox<>();
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"", "Teacher", "Student"}));
 		comboBox.setBounds(175, 61, 188, 22);
 		contentPane.add(comboBox);
@@ -93,7 +104,7 @@ public class SignIn_Window extends JFrame {
 		contentPane.add(passwordField);
 		
 		
-		JCheckBox showPass = new JCheckBox("Show password");
+		showPass = new JCheckBox("Show password");
 		showPass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(showPass.isSelected()) 
@@ -109,20 +120,8 @@ public class SignIn_Window extends JFrame {
 		JButton summit = new JButton("Sign In");
 		summit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					  if(checkLogin( passwordField.getPassword(), (String) comboBox.getSelectedItem())) {
-						  usernameField.setText("");
-						  passwordField.setText("");
-						  comboBox.setSelectedIndex(0);
-						  showPass.setSelected(false);
-						  openTeacherUI();
-						  JOptionPane.showMessageDialog(null, "Login successfully !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
-					  }
-				} catch (HeadlessException | ClassNotFoundException e1) {
-					e1.printStackTrace();
-				}	
-			}
-		});
+				   summitAction();
+			}});
 		summit.setBounds(175, 270, 89, 33);
 		contentPane.add(summit);
 
@@ -144,13 +143,47 @@ public class SignIn_Window extends JFrame {
 
 	}
 	
+
+    private void loadClassToTeacherAccount() throws ClassNotFoundException {
+    	boolean check = false;
+    	
+    	if(!id.equals(null) ) {
+    		LoadCreatedClass.ID = id;
+    		check = getCreatedClass.getCreatedClass();
+    	}
+    	
+    	if(check) {
+    		Teacher_UI.teacherOwnClass = getCreatedClass.getInfoClass();
+    		Teacher_UI.componentClass  = getCreatedClass.getNum();
+			openTeacherUI();
+    	}
+
+	}
+	
 	
    private void openTeacherUI() {
 	    setVisible(false);
-		teacher_UI.setVisible(true);
-		teacher_UI.setLocationRelativeTo(null);
+	    teacher_UI.frame.setVisible(true);
+	    teacher_UI.frame.setLocationRelativeTo(null);
+	    teacher_UI.initializeClass();
 		
    }
+
+   private void summitAction() {
+		try {
+			  if(checkLogin( passwordField.getPassword(), (String) comboBox.getSelectedItem())) {
+				  usernameField.setText("");
+				  passwordField.setText("");
+				  comboBox.setSelectedIndex(0);
+				  showPass.setSelected(false);
+				  loadClassToTeacherAccount();
+				  JOptionPane.showMessageDialog(null, "Login successfully !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
+			  }
+		} catch (HeadlessException | ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+   }
+   
 	
 
    private boolean checkLogin(char[] password, String selection) throws HeadlessException, ClassNotFoundException {
@@ -161,15 +194,15 @@ public class SignIn_Window extends JFrame {
 	return false;
 
    }
+   
 
-	
 	private boolean checkExistedAccount(String nameToCheck,char[] pass, String selection) throws ClassNotFoundException {
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
 		    String password = new String(pass);
 	        String sql_student = "SELECT id_student, pass_word FROM test.user_student WHERE username = ?;";
 	        String sql_teacher = "SELECT id_teacher, pass_word FROM test.user_teacher WHERE username = ? ;";
 	        String sql = null;
-	        String id  = null;
+	        id  = null;
 	        
 	        
 	        if(selection.equals("Student"))

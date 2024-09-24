@@ -12,6 +12,9 @@ import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -19,6 +22,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -26,15 +30,21 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JPasswordField;
 import javax.swing.JCheckBox;
 
-public class Teacher_UI extends JFrame {
+public class Teacher_UI{
 
-	private static final long serialVersionUID = 1L;
+
     private static final String CHARACTERS_CODE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();
     public  static String teacherID;
     private boolean resultSetError = false;
     private String uniqueClassCode;
     
+    
+    public static ArrayList<String> teacherOwnClass;
+    public static int componentClass;
+    
+    
+    public  JFrame frame;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
@@ -45,7 +55,8 @@ public class Teacher_UI extends JFrame {
     private JButton summitClass; 
     private JCheckBox showPass; 
     private JLabel teacher_class;
-
+    private GridBagConstraints gbc;
+    private JPanel panel;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -56,18 +67,19 @@ public class Teacher_UI extends JFrame {
 			e.printStackTrace();
 		}
 		 
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 425);
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setBounds(100, 100, 700, 425);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
+		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		
-		scrollPane = new JScrollPane();
+		panel = new JPanel(new GridBagLayout());
+		scrollPane = new JScrollPane(panel);
 		scrollPane.setBounds(10, 127, 664, 248);
-		contentPane.add(scrollPane);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		frame.add(scrollPane);
 		
 		
 		
@@ -86,7 +98,7 @@ public class Teacher_UI extends JFrame {
 		JButton createClass = new JButton("Create class");
 		createClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				createNewClass();
+				createNewClassButton();
 			}
 		});
 		createClass.setBounds(517, 32, 157, 54);
@@ -111,26 +123,22 @@ public class Teacher_UI extends JFrame {
 		name_CreateClass.setVisible(false);
 		createClass_panel.add(name_CreateClass);
 		
+		
 		pass_CreatClass = new JLabel("Pass (Optional)");
 		pass_CreatClass.setBounds(10, 59, 92, 20);
 		pass_CreatClass.setVisible(false);
 		createClass_panel.add(pass_CreatClass);
 		
+		
 		summitClass = new JButton("Summit");
 		summitClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					if(generateUniqueCode())
-					    pushInfotoSQL();
-					JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
+				summitAction();
+			}});
 		summitClass.setBounds(254, 11, 89, 25);
 		createClass_panel.setVisible(false);
 		createClass_panel.add(summitClass);
+		
 		
 		showPass = new JCheckBox("Show pass");
 		showPass.addActionListener(new ActionListener() {
@@ -141,19 +149,76 @@ public class Teacher_UI extends JFrame {
 					passwordField.setEchoChar(('*'));
 			}
 		});
+		
 		showPass.setBounds(254, 55, 89, 24);
 		showPass.setVisible(false);
 		createClass_panel.add(showPass);
 		
 
-
-	
-		
-
 	}
 	
 	
-	private void createNewClass() {
+	private void summitAction() {
+		try {
+			
+			if(textField.getText().equals(""))
+				JOptionPane.showMessageDialog(null, "Your class name is empty", "Warning!", JOptionPane.WARNING_MESSAGE);
+			else {
+			   if(generateUniqueCode())
+			        pushInfotoSQL();
+			        JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);
+			}
+			
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	
+	public void initializeClass() {
+		
+		gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        int j = 0;
+        for (int i = 0; i < (componentClass / 3); i++) {
+        	
+        	String classCode = teacherOwnClass.get(j++);
+        	String className = teacherOwnClass.get(j++);
+        	String classPass = teacherOwnClass.get(j++);
+        	
+            JLabel classCode_label = new JLabel("Code: "+classCode);
+            JButton button = new JButton(className);
+            JLabel label2 = new JLabel();
+        	
+        	if(classPass == null) 
+        		label2.setText(" Password: ");
+        	else 
+        		label2.setText(" Password: "+classPass);
+
+            gbc.gridx = 0; // Column 1
+            gbc.gridy = i;// Incrementing row number
+            panel.add(button, gbc);
+
+            // Position the label in the first column
+            gbc.gridx = 1; // Column 2
+            panel.add(classCode_label, gbc);
+            
+            gbc.gridx = 2; // Column 2
+            panel.add(label2, gbc);
+
+
+        }
+        
+        panel.revalidate();
+        panel.repaint();
+        
+        
+        
+	}
+	
+	
+	private void createNewClassButton() {
+		initializeClass();
 		createClass_panel.setVisible(!createClass_panel.isVisible());
 		textField.setVisible(true);
 		showPass.setVisible(true);
