@@ -145,28 +145,25 @@ public class SignIn_Window extends JFrame {
 	
 
     private void loadClassToTeacherAccount() throws ClassNotFoundException {
-    	boolean check = false;
     	
     	if(!id.equals(null) ) {
     		LoadCreatedClass.ID = id;
-    		check = getCreatedClass.getCreatedClass();
-    	}
-    	
-    	if(check) {
+    		getCreatedClass.getCreatedClass();
     		Teacher_UI.teacherOwnClass = getCreatedClass.getInfoClass();
     		Teacher_UI.componentClass  = getCreatedClass.getNum();
 			openTeacherUI();
     	}
+
 
 	}
 	
 	
    private void openTeacherUI() {
 	    setVisible(false);
+	    teacher_UI.initializeClass();
 	    teacher_UI.frame.setVisible(true);
 	    teacher_UI.frame.setLocationRelativeTo(null);
-	    teacher_UI.initializeClass();
-		
+	    
    }
 
    private void summitAction() {
@@ -232,7 +229,7 @@ public class SignIn_Window extends JFrame {
                     if(storedPassword.equals(password)) { 
                     	 checkAuth = true;
                     	 Teacher_UI.teacherID = id;
-                    	 System.out.println(id);
+                    	 //System.out.println(id);
                     }
                  }
 	             

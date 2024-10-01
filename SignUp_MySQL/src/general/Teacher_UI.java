@@ -38,6 +38,7 @@ public class Teacher_UI{
     public  static String teacherID;
     private boolean resultSetError = false;
     private String uniqueClassCode;
+    private int iJSrollPane = 0;
     
     
     public static ArrayList<String> teacherOwnClass;
@@ -57,16 +58,28 @@ public class Teacher_UI{
     private JLabel teacher_class;
     private GridBagConstraints gbc;
     private JPanel panel;
+    private JButton removeClass;
+    
+    private ArrayList<JCheckBox> checkBox_Class;
+    private ArrayList<JButton> button_Class;
+    private ArrayList<JLabel> labelCode_Class;
+    private ArrayList<String> deleteList;
+    private long lastCheck = System.currentTimeMillis();
+
+
 
 	public Teacher_UI(SignIn_Window signin) {
 		
 		 try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 
+	    checkBox_Class = new ArrayList<>();
+	    button_Class = new ArrayList<>();
+	    labelCode_Class = new ArrayList<>();
+	    deleteList = new ArrayList<>();
+	    
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 700, 425);
@@ -75,17 +88,20 @@ public class Teacher_UI{
 		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+		
 		panel = new JPanel(new GridBagLayout());
 		scrollPane = new JScrollPane(panel);
 		scrollPane.setBounds(10, 127, 664, 248);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		frame.add(scrollPane);
+		frame.getContentPane().add(scrollPane);
 		
 		
 		
 		createClass_panel = new JLayeredPane();
 		createClass_panel.setBackground(Color.DARK_GRAY);
-		createClass_panel.setBounds(147, 32, 353, 90);
+		createClass_panel.setBounds(154, 11, 353, 105);
 		createClass_panel.setOpaque(true);
 		createClass_panel.setVisible(false);
 		contentPane.add(createClass_panel);
@@ -101,7 +117,7 @@ public class Teacher_UI{
 				createNewClassButton();
 			}
 		});
-		createClass.setBounds(517, 32, 157, 54);
+		createClass.setBounds(517, 11, 157, 47);
 		contentPane.add(createClass);
 		
 		
@@ -154,31 +170,111 @@ public class Teacher_UI{
 		showPass.setVisible(false);
 		createClass_panel.add(showPass);
 		
+		removeClass = new JButton("Delete Class");
+		removeClass.setVisible(false);
+
+		removeClass.setBounds(517, 78, 157, 38);
+		contentPane.add(removeClass);
 
 	}
 	
 	
 	private void summitAction() {
-		try {
-			
-			if(textField.getText().equals(""))
-				JOptionPane.showMessageDialog(null, "Your class name is empty", "Warning!", JOptionPane.WARNING_MESSAGE);
+
+		
+	try {
+		    
+			if(!checkDuplicateClass(textField.getText()))
+				JOptionPane.showMessageDialog(null, "Your class name is invalid", "Warning!", JOptionPane.WARNING_MESSAGE);
 			else {
 			   if(generateUniqueCode())
 			        pushInfotoSQL();
+			        addClass();
 			        JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);
-			}
+		}
 			
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
+		}
+		
+	}
+	
+	private void addClass() {
+		    
+		    
+		    char[] pass = passwordField.getPassword();
+		    String password  = new String(pass);
+        	
+            JLabel classCode_label = new JLabel("Code: "+uniqueClassCode+"     Password: "+password);
+            JButton button = new JButton(textField.getText());
+            JCheckBox box = new JCheckBox();
+            
+            
+            box.addActionListener(new ActionListener() {        
+                public void actionPerformed(ActionEvent e) {  
+                	if(box.isSelected())
+                		removeClass.setVisible(true);
+                	else 
+                		removeClass.setVisible(false);
+                	
+            		removeClass.addActionListener(new ActionListener() {
+            			public void actionPerformed(ActionEvent e) {
+            				deleteClass(box,button,classCode_label);
+            				countDown();
+            			}});
+
+            }});
+            
+            checkBox_Class.add(box);
+            button_Class.add(button);
+            labelCode_Class.add(classCode_label);
+        	
+            gbc.gridx = 0; 
+            gbc.gridy = iJSrollPane++;
+            panel.add(box, gbc);
+            
+            gbc.gridx = 1; 
+            panel.add(button, gbc);
+
+            
+            gbc.gridx = 2; 
+            panel.add(classCode_label, gbc);
+
+            panel.revalidate();
+            panel.repaint();
+            
+            
+        
+		
+	}
+	
+	private void deleteClass(JCheckBox box,JButton button,JLabel label) {
+		deleteList.add(button.getText());
+		panel.remove(box);
+		panel.remove(button);
+		panel.remove(label);
+		checkBox_Class.remove(box);
+		button_Class.remove(button);
+		labelCode_Class.remove(label);
+		panel.revalidate();
+		panel.repaint();
+		removeClass.setVisible(false);
+	}
+	
+	private void countDown() {
+		if(System.currentTimeMillis() - lastCheck > 1000) {
+			try {
+				deleteDataSQL();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			lastCheck = System.currentTimeMillis();
 		}
 	}
 	
 	
 	public void initializeClass() {
 		
-		gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
         int j = 0;
         for (int i = 0; i < (componentClass / 3); i++) {
         	
@@ -188,23 +284,42 @@ public class Teacher_UI{
         	
             JLabel classCode_label = new JLabel("Code: "+classCode);
             JButton button = new JButton(className);
-            JLabel label2 = new JLabel();
+            JCheckBox box = new JCheckBox();
+            box.addActionListener(new ActionListener() {        
+                public void actionPerformed(ActionEvent e) {  
+                	if(box.isSelected())
+                		removeClass.setVisible(true);
+                	else 
+                		removeClass.setVisible(false);
+                	
+            		removeClass.addActionListener(new ActionListener() {
+            			public void actionPerformed(ActionEvent e) {
+            				deleteClass(box,button,classCode_label);
+            				countDown();
+            			}});
+
+            }});
+            
+            checkBox_Class.add(box);
+            button_Class.add(button);
+            labelCode_Class.add(classCode_label);
         	
         	if(classPass == null) 
-        		label2.setText(" Password: ");
+        		classCode_label.setText("Code: "+classCode+"     Password: ");
         	else 
-        		label2.setText(" Password: "+classPass);
+        		classCode_label.setText("Code: "+classCode+"     Password: "+classPass);
 
-            gbc.gridx = 0; // Column 1
-            gbc.gridy = i;// Incrementing row number
+            gbc.gridx = 0; 
+            gbc.gridy = iJSrollPane++;
+            panel.add(box, gbc);
+            
+            gbc.gridx = 1;         
             panel.add(button, gbc);
 
-            // Position the label in the first column
-            gbc.gridx = 1; // Column 2
-            panel.add(classCode_label, gbc);
             
-            gbc.gridx = 2; // Column 2
-            panel.add(label2, gbc);
+            gbc.gridx = 2; 
+            panel.add(classCode_label, gbc);
+
 
 
         }
@@ -218,7 +333,6 @@ public class Teacher_UI{
 	
 	
 	private void createNewClassButton() {
-		initializeClass();
 		createClass_panel.setVisible(!createClass_panel.isVisible());
 		textField.setVisible(true);
 		showPass.setVisible(true);
@@ -280,6 +394,29 @@ public class Teacher_UI{
 		
 	}
 	
+	private void deleteDataSQL() throws ClassNotFoundException {
+		
+		Class.forName("com.mysql.cj.jdbc.Driver"); 
+		StringBuilder sql = new StringBuilder("delete from class where class_name in (");
+		
+        for(int i = 0; i < deleteList.size(); i++) {
+        	sql.append("'"+deleteList.get(i)+"',");
+        }
+        sql.append("'')"+"and teacher_id = "+teacherID);
+
+		
+		
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+	             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        	     ps.executeUpdate(); 
+			     ps.close();
+			     conn.close(); 
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+        deleteList.clear();
+	}
+	
 	private boolean checkUniqueCode(String codetoCheck) throws ClassNotFoundException {
 		
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
@@ -328,6 +465,22 @@ public class Teacher_UI{
     }
 	
 	
+	private boolean checkDuplicateClass(String name) {
+		
+		if(textField.getText().equals(""))
+			return false;
+		
+		int j = 1;
+		for(int i = 0; i < teacherOwnClass.size() / 3; i++) {
+			if(teacherOwnClass.get(j).equals(name)) 
+				return false;	
+			j += 3;
+		}return true;
+		
+	}
+	
+
+
 	
 	
 }

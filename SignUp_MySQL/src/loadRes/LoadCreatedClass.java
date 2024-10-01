@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 
+
 public class LoadCreatedClass {
 
 	private ArrayList<String> classInfo;
@@ -21,7 +22,7 @@ public class LoadCreatedClass {
 	 
 	 
 	 
-	 public boolean getCreatedClass() throws ClassNotFoundException {
+	 public void getCreatedClass() throws ClassNotFoundException {
 
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
 	        String query = "SELECT class_code, class_name, pass_word FROM test.class WHERE teacher_id = "+ID;
@@ -43,8 +44,9 @@ public class LoadCreatedClass {
 	                classInfo.add(tempContainer);
 	                classInfo.add(tempContainer1);
 	                classInfo.add(tempContainer2);
-	                
+  
 	            }
+	            
 
 	            rs.close();
 	            st.close();
@@ -53,10 +55,7 @@ public class LoadCreatedClass {
 	            e.printStackTrace();
 	        }
 	        
-	        if(numberOfComponents > 0)
-	        	return true;
-	        else 
-	        	return false;
+
 	        
 	    }
 	 
