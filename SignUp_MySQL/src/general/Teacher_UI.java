@@ -45,8 +45,8 @@ public class Teacher_UI{
     public static int componentClass;
     
     
-    public  JFrame frame;
-	private JPanel contentPane;
+    public  static JFrame frame;
+	private static JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
     private JScrollPane scrollPane;
@@ -59,14 +59,15 @@ public class Teacher_UI{
     private GridBagConstraints gbc;
     private JPanel panel;
     private JButton removeClass;
+    private JButton createClass;
     
     private ArrayList<JCheckBox> checkBox_Class;
     private ArrayList<JButton> button_Class;
     private ArrayList<JLabel> labelCode_Class;
     private ArrayList<String> deleteList;
-    private long lastCheck = System.currentTimeMillis();
+    private int numCheckBox = 0;
 
-
+    private Teacher_Class teacherQuiz;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -75,19 +76,27 @@ public class Teacher_UI{
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		 
+		 
+		frame = new JFrame();
+		
+		teacherQuiz = new Teacher_Class();
+		
 	    checkBox_Class = new ArrayList<>();
 	    button_Class = new ArrayList<>();
 	    labelCode_Class = new ArrayList<>();
 	    deleteList = new ArrayList<>();
 	    
-		frame = new JFrame();
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 700, 425);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		frame.setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+//		contentPane.add(teacherQuiz);
+		frame.setContentPane(contentPane);
+
+
 		gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 		
@@ -95,6 +104,7 @@ public class Teacher_UI{
 		scrollPane = new JScrollPane(panel);
 		scrollPane.setBounds(10, 127, 664, 248);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
 		frame.getContentPane().add(scrollPane);
 		
 		
@@ -111,7 +121,7 @@ public class Teacher_UI{
 		teacher_class.setBounds(10, 86, 157, 30);
 		contentPane.add(teacher_class);
 		
-		JButton createClass = new JButton("Create class");
+		createClass = new JButton("Create class");
 		createClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createNewClassButton();
@@ -150,6 +160,7 @@ public class Teacher_UI{
 		summitClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				summitAction();
+
 			}});
 		summitClass.setBounds(254, 11, 89, 25);
 		createClass_panel.setVisible(false);
@@ -212,17 +223,25 @@ public class Teacher_UI{
             
             box.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                	if(box.isSelected())
+                	if(box.isSelected()) {
                 		removeClass.setVisible(true);
-                	else 
+                		numCheckBox++;
+                	}else {
                 		removeClass.setVisible(false);
-                	
+                		numCheckBox--;
+                	}
             		removeClass.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
             				deleteClass(box,button,classCode_label);
             				countDown();
             			}});
 
+            }});
+            
+            button.addActionListener(new ActionListener() {        
+                public void actionPerformed(ActionEvent e) {  
+                       System.out.println(button.getText());
+//                       openTeacherClass();
             }});
             
             checkBox_Class.add(box);
@@ -248,28 +267,16 @@ public class Teacher_UI{
 		
 	}
 	
-	private void deleteClass(JCheckBox box,JButton button,JLabel label) {
-		deleteList.add(button.getText());
-		panel.remove(box);
-		panel.remove(button);
-		panel.remove(label);
-		checkBox_Class.remove(box);
-		button_Class.remove(button);
-		labelCode_Class.remove(label);
-		panel.revalidate();
-		panel.repaint();
-		removeClass.setVisible(false);
-	}
+
 	
 	private void countDown() {
-		if(System.currentTimeMillis() - lastCheck > 1000) {
+	    if(numCheckBox == deleteList.size()) {
 			try {
 				deleteDataSQL();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			lastCheck = System.currentTimeMillis();
-		}
+	    }
 	}
 	
 	
@@ -287,17 +294,24 @@ public class Teacher_UI{
             JCheckBox box = new JCheckBox();
             box.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                	if(box.isSelected())
+                	if(box.isSelected()) {
                 		removeClass.setVisible(true);
-                	else 
+                		numCheckBox++;
+                	}else {
                 		removeClass.setVisible(false);
-                	
+                		numCheckBox--;
+                	}
             		removeClass.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
             				deleteClass(box,button,classCode_label);
             				countDown();
             			}});
 
+            }});
+            
+            button.addActionListener(new ActionListener() {        
+                public void actionPerformed(ActionEvent e) {  
+                       System.out.println(button.getText());
             }});
             
             checkBox_Class.add(box);
@@ -331,6 +345,18 @@ public class Teacher_UI{
         
 	}
 	
+	private void deleteClass(JCheckBox box,JButton button,JLabel label) {
+		deleteList.add(button.getText());
+		panel.remove(box);
+		panel.remove(button);
+		panel.remove(label);
+		checkBox_Class.remove(box);
+		button_Class.remove(button);
+		labelCode_Class.remove(label);
+		panel.revalidate();
+		panel.repaint();
+		removeClass.setVisible(false);
+	}
 	
 	private void createNewClassButton() {
 		createClass_panel.setVisible(!createClass_panel.isVisible());
@@ -383,7 +409,7 @@ public class Teacher_UI{
 	            e.printStackTrace();
 	        }
 		
-		createClass_panel.setVisible(false);
+		
 		textField.setVisible(false);
 		showPass.setVisible(false);
 		createClass_panel.setVisible(false);
@@ -401,6 +427,7 @@ public class Teacher_UI{
 		
         for(int i = 0; i < deleteList.size(); i++) {
         	sql.append("'"+deleteList.get(i)+"',");
+        	
         }
         sql.append("'')"+"and teacher_id = "+teacherID);
 
@@ -414,6 +441,8 @@ public class Teacher_UI{
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
+        System.out.println(sql.toString());
+        numCheckBox = 0;
         deleteList.clear();
 	}
 	
@@ -480,7 +509,16 @@ public class Teacher_UI{
 	}
 	
 
-
+   private void openTeacherClass() {
+	    contentPane.setVisible(false);	
+		teacherQuiz.setVisible(true);
+		frame.setContentPane(teacherQuiz);
+   }
+   
+   public static void returnPage(){
+	   contentPane.setVisible(true);
+	   frame.setContentPane(contentPane);
+   }
 	
 	
 }
