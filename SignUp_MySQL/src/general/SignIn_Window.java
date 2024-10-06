@@ -63,7 +63,7 @@ public class SignIn_Window extends JFrame {
 		 
 		getCreatedClass = new LoadCreatedClass();
 		teacher_UI = new Teacher_UI(this);
-		teacher_UI.frame.setVisible(false);
+		Teacher_UI.frame.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 530, 353);
@@ -161,8 +161,8 @@ public class SignIn_Window extends JFrame {
    private void openTeacherUI() {
 	    setVisible(false);
 	    teacher_UI.initializeClass();
-	    teacher_UI.frame.setVisible(true);
-	    teacher_UI.frame.setLocationRelativeTo(null);
+	    Teacher_UI.frame.setVisible(true);
+	    Teacher_UI.frame.setLocationRelativeTo(null);
 	    
    }
 

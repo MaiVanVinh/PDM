@@ -67,7 +67,7 @@ public class Teacher_UI{
     private ArrayList<String> deleteList;
     private int numCheckBox = 0;
 
-    private Teacher_Class teacherQuiz;
+//    private Teacher_Class teacherQuiz;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -80,7 +80,7 @@ public class Teacher_UI{
 		 
 		frame = new JFrame();
 		
-		teacherQuiz = new Teacher_Class();
+//		teacherQuiz = new Teacher_Class();
 		
 	    checkBox_Class = new ArrayList<>();
 	    button_Class = new ArrayList<>();
@@ -509,12 +509,12 @@ public class Teacher_UI{
 	}
 	
 
-   private void openTeacherClass() {
-	    contentPane.setVisible(false);	
-		teacherQuiz.setVisible(true);
-		frame.setContentPane(teacherQuiz);
-   }
-   
+//   private void openTeacherClass() {
+//	    contentPane.setVisible(false);	
+//		teacherQuiz.setVisible(true);
+//		frame.setContentPane(teacherQuiz);
+//   }
+//   
    public static void returnPage(){
 	   contentPane.setVisible(true);
 	   frame.setContentPane(contentPane);
