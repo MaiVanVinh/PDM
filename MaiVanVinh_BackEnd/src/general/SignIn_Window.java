@@ -9,8 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import loadRes.LoadCreatedClass;
-import loadRes.LoadQuiz;
+import updateRes.LoadCreatedClass;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -50,7 +49,7 @@ public class SignIn_Window extends JFrame {
 	
     private Teacher_UI teacher_UI;
     private LoadCreatedClass getCreatedClass;
-    private LoadQuiz l = new LoadQuiz("QTZXBGPK");
+//    private LoadQuiz l = new LoadQuiz("ZYGVHGZH");
     
     
 	public SignIn_Window(MainMenu mainmenu) {
@@ -152,7 +151,8 @@ public class SignIn_Window extends JFrame {
     		getCreatedClass.getCreatedClass();
     		Teacher_UI.teacherOwnClass = getCreatedClass.getInfoClass();
     		Teacher_UI.componentClass  = getCreatedClass.getNum();
-    		l.loadQuiz();
+//    		l.loadQuiz();
+//    		l.getQuiz();
 			openTeacherUI();
     	}
 

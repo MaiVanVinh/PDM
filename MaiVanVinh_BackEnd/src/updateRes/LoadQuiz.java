@@ -1,4 +1,4 @@
-package loadRes;
+package updateRes;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,10 +9,13 @@ import java.util.ArrayList;
 
 import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
+import uploadQaA.MainQuiz;
 
 public class LoadQuiz {
 
 	private String code;
+	private ArrayList<String> quizName;
+	private ArrayList<MainQuiz> masterList;
 	private ArrayList<MainQuestion> list;
 	private ArrayList<MainAnswer> ans;
 	private ArrayList<ArrayList<MainAnswer>> answers;
@@ -20,31 +23,56 @@ public class LoadQuiz {
 	
 	public LoadQuiz(String c) {
 		this.code = c;	
+		masterList = new ArrayList<>();
 		answers = new ArrayList<>();
 		list = new ArrayList<>();
 		ans = new ArrayList<>();
+		quizName = new ArrayList<>();
 	}
 	
-	public boolean loadQuiz() throws ClassNotFoundException {
+	public void loadQuizName() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT quiz_id, class_code FROM test.quiz WHERE class_code = ?;";
+		String query = "SELECT title FROM test.quiz WHERE class_code = ?;";
 		
 		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, code);
             try (ResultSet rs = stmt.executeQuery()) {
-              if (rs.next()) {
+              while (rs.next()) {
+            	  quizName.add(rs.getString("title"));
+              }
+    
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+	}
+	
+	
+	public void loadQA() throws ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver"); 
+		String query = "SELECT title, quiz_id, class_code FROM test.quiz WHERE class_code = ?;";
+		
+		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+	        PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, code);
+            try (ResultSet rs = stmt.executeQuery()) {
+              while (rs.next()) {
                 int id = rs.getInt("quiz_id");
                 questions(id);
-              }else
-            	  return false;
+                masterList.add(new MainQuiz(rs.getString("title"),new ArrayList<>(list)));
+                list.clear();
+              }
 
             	    
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true; 
+		
+
 	}
 	
 	public void questions(int quizID) throws ClassNotFoundException {
@@ -66,12 +94,13 @@ public class LoadQuiz {
 	            e.printStackTrace();
 	        }
 		
-        for(MainQuestion question : list) {
-       	   System.out.println(question.getQuestion());
-       	     for(MainAnswer anss : question.getAns()) {
-                System.out.println(anss.getOption());
-       	     }  
-        }
+//        for(MainQuestion question : list) {
+//       	   System.out.println(question.getQuestion());
+//       	     for(MainAnswer anss : question.getAns()) {
+//                System.out.println(anss.getOption());
+//       	     }  
+//        }
+        answers.clear();
 	
 	}
 	
@@ -87,8 +116,28 @@ public class LoadQuiz {
 	}
 	
 
+	public ArrayList<MainQuestion> getQuestions(){
+		return list;
+	}
 
+	public ArrayList<String> getQuizName(){
+		return quizName;
+	}
+	
+	public ArrayList<MainQuiz> getQuiz(){
+		return masterList;
+	}
+	
 	public String getCode() {
 		return code;
 	}
+	
+	public void clear() {
+		answers.clear();
+		quizName.clear();
+	}
+	
+
+	
 }
+

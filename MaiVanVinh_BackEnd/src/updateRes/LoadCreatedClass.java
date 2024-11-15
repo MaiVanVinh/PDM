@@ -1,4 +1,5 @@
-package loadRes;
+package updateRes;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -74,3 +75,4 @@ public class LoadCreatedClass {
 
 	
 }
+

@@ -192,6 +192,7 @@ public class Teacher_Class extends JFrame {
 		
 		addQuestion();
 		showQuestion_Answer();
+//		addQuiz();
 		label.setText("Quiz Name");
 		
 		JLayeredPane_List.clear();
@@ -410,7 +411,7 @@ public class Teacher_Class extends JFrame {
              }
              
              try {
-				uploadToDatabase.pushData("QTZXBGPK",questionName,que);
+				uploadToDatabase.pushData("ZYGVHGZH",questionName,que);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
