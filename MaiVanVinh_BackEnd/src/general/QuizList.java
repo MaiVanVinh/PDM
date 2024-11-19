@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
+import updateRes.DeleteQuiz;
 import updateRes.LoadQuiz;
 import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
@@ -24,6 +25,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class QuizList extends JFrame {
@@ -54,16 +56,16 @@ public class QuizList extends JFrame {
     private ArrayList<JCheckBox> checkBox_Class;
     private ArrayList<JButton> button_Class;
     private ArrayList<JLabel> labelCode_Class;
-//    private ArrayList<String> deleteList;
+    private ArrayList<String> deleteList;
     private GridBagConstraints gbc;
     private JPanel panel;
     private int iJSrollPane = 0;
-//    private int numCheckBox = 0;
     private JButton removeQuiz;
     private LoadQuiz l = new LoadQuiz("ZYGVHGZH");
     private ArrayList<MainQuiz> masterList;
     private ArrayList<String> quizList;
     
+    private DeleteQuiz d;
     
 	public QuizList() {
 		
@@ -78,7 +80,8 @@ public class QuizList extends JFrame {
 	    labelCode_Class = new ArrayList<>();
 	    quizList = new ArrayList<>();
 	    masterList = new ArrayList<>();
-//	    deleteList = new ArrayList<>();
+	    deleteList = new ArrayList<>();
+        d = new DeleteQuiz();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 700, 425);
@@ -98,6 +101,22 @@ public class QuizList extends JFrame {
 		removeQuiz.setBounds(573, 107, 101, 32);
 		removeQuiz.setVisible(false);
 		contentPane.add(removeQuiz);
+		
+		JButton checkDetList = new JButton("Button");
+		checkDetList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+                   d.getReady(deleteList, "ZYGVHGZH");   
+                   try {
+					d.deleteSQL();
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		checkDetList.setBounds(10, 110, 89, 23);
+		contentPane.add(checkDetList);
 		
 		gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -126,9 +145,9 @@ public class QuizList extends JFrame {
             public void actionPerformed(ActionEvent e) {  
             	checkSelectedBox();
         		removeQuiz.addActionListener(new ActionListener() {
-        			public void actionPerformed(ActionEvent e) {
-        					if(box.isSelected()) 
-        						deleteQuiz(box,button,classCode_label);
+        			public void actionPerformed(ActionEvent e) {  		          
+        					 if(box.isSelected()) 
+        						 deleteQuiz(box,button,classCode_label);
   	
         			}});
 
@@ -171,17 +190,18 @@ public class QuizList extends JFrame {
 	}
 	
 	private void deleteQuiz(JCheckBox box,JButton button,JLabel label) {
-//		deleteList.add(button.getText());
-//		panel.remove(box);
-//		panel.remove(button);
-//		panel.remove(label);
-//		checkBox_Class.remove(box);
-//		button_Class.remove(button);
-//		labelCode_Class.remove(label);
-//		panel.revalidate();
-//		panel.repaint();
-//		removeQuiz.setVisible(false);
-//		deleteList.clear();
+		deleteList.add(button.getText());
+		panel.remove(box);
+		panel.remove(button);
+		panel.remove(label);
+		checkBox_Class.remove(box);
+		button_Class.remove(button);
+		labelCode_Class.remove(label);
+		panel.revalidate();
+		panel.repaint();
+		removeQuiz.setVisible(false);
+		
+		
 	}
 	
 	private void displayQA(String name) {
@@ -199,5 +219,4 @@ public class QuizList extends JFrame {
 		
 
 	}
-	
 }
