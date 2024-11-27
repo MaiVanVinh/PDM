@@ -60,6 +60,35 @@ public class UploadToDatabase {
 		  
 	}
 	
+	public void uploadQuestion(int quizID,String classCode,String title, ArrayList<MainQuestion> questions) throws ClassNotFoundException, SQLException {
+		Class.forName("com.mysql.cj.jdbc.Driver"); 
+		String sqlQue = ("INSERT INTO Question (quiz_id, question_text) VALUES (?,?);");
+		String sqlAns = ("INSERT INTO Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
+		
+	     for(MainQuestion q : questions) {
+	    	PreparedStatement psQuestion = conn().prepareStatement(sqlQue,Statement.RETURN_GENERATED_KEYS);
+	    	psQuestion.setInt(1, quizID);
+	    	psQuestion.setString(2, q.getQuestion());
+	    	psQuestion.executeUpdate();
+	    	
+           ResultSet questionKeys = psQuestion.getGeneratedKeys();
+           questionKeys.next();
+           int questionId = questionKeys.getInt(1);
+	    	 
+	    	 for(MainAnswer a : q.getAns()) {
+
+	                PreparedStatement answerStmt = conn().prepareStatement(sqlAns);
+	                answerStmt.setInt(1, questionId);
+	                answerStmt.setString(2, a.getOption());
+	                answerStmt.setString(3, a.isCorrect());
+	                answerStmt.executeUpdate();
+	    		 
+	    	 }
+	    	 
+	    	 
+	     }
+	}
+	
 	private Connection conn() throws SQLException {
 		Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
 		return conn;

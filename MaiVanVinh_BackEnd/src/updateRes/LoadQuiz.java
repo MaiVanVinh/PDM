@@ -19,6 +19,7 @@ public class LoadQuiz {
 	private ArrayList<MainQuestion> list;
 	private ArrayList<MainAnswer> ans;
 	private ArrayList<ArrayList<MainAnswer>> answers;
+	
 
 	
 	public LoadQuiz(String c) {
@@ -32,7 +33,7 @@ public class LoadQuiz {
 	
 	public void loadQuizName() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT title FROM test.quiz WHERE class_code = ?;";
+		String query = "SELECT quiz_id,title FROM test.quiz WHERE class_code = ?;";
 		
 		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -40,6 +41,7 @@ public class LoadQuiz {
             try (ResultSet rs = stmt.executeQuery()) {
               while (rs.next()) {
             	  quizName.add(rs.getString("title"));
+
               }
     
             }
@@ -62,7 +64,7 @@ public class LoadQuiz {
               while (rs.next()) {
                 int id = rs.getInt("quiz_id");
                 questions(id);
-                masterList.add(new MainQuiz(rs.getString("title"),new ArrayList<>(list)));
+                masterList.add(new MainQuiz(rs.getInt("quiz_id"),rs.getString("title"),new ArrayList<>(list)));
                 list.clear();
               }
 
@@ -87,7 +89,7 @@ public class LoadQuiz {
 	            	while(rs.next()) {
                        int questionID = rs.getInt("question_id");
                        answer(questionID,conn);   
-                       list.add(new MainQuestion(rs.getString("question_text"),answers.get(i++)));
+                       list.add(new MainQuestion(rs.getInt("question_id"),rs.getString("question_text"),answers.get(i++)));
 	            	} 
 	            }
 	        } catch (SQLException e) {
@@ -105,12 +107,12 @@ public class LoadQuiz {
 	}
 	
 	private void answer(int ID, Connection conn) throws SQLException {
-		String answerQuery = "SELECT answer_text,is_correct FROM test.answer WHERE question_id = "+ID;
+		String answerQuery = "SELECT answer_id, answer_text,is_correct FROM test.answer WHERE question_id = "+ID;
 		ans.clear();
 		PreparedStatement st = conn.prepareStatement(answerQuery); 
 		ResultSet rs = st.executeQuery();
 		while(rs.next()) {
-			ans.add(new MainAnswer(rs.getString("answer_text"),rs.getString("is_correct")));
+			ans.add(new MainAnswer(rs.getInt("answer_id"),rs.getString("answer_text"),rs.getString("is_correct")));
 		}answers.add(new ArrayList<>(ans));
 
 	}

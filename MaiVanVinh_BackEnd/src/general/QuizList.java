@@ -1,19 +1,18 @@
 package general;
 
-import java.awt.EventQueue;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 import updateRes.DeleteQuiz;
+import updateRes.DisplayOrEditQuiz;
 import updateRes.LoadQuiz;
 import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
@@ -28,31 +27,9 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
-public class QuizList extends JFrame {
+public class QuizList extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					QuizList frame = new QuizList();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
-	
     private ArrayList<JCheckBox> checkBox_Class;
     private ArrayList<JButton> button_Class;
     private ArrayList<JLabel> labelCode_Class;
@@ -66,15 +43,17 @@ public class QuizList extends JFrame {
     private ArrayList<String> quizList;
     
     private DeleteQuiz d;
+    private DisplayOrEditQuiz displayOrEditQuiz;
+    private Teacher_Class teacherClass;
     
-	public QuizList() {
+	public QuizList(Teacher_Class teacherClass) {
 		
 		try {
-			UIManager.setLookAndFeel(new FlatLightLaf());
+			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		
+		this.teacherClass = teacherClass;
 	    checkBox_Class = new ArrayList<>();
 	    button_Class = new ArrayList<>();
 	    labelCode_Class = new ArrayList<>();
@@ -82,42 +61,37 @@ public class QuizList extends JFrame {
 	    masterList = new ArrayList<>();
 	    deleteList = new ArrayList<>();
         d = new DeleteQuiz();
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 425);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		panel = new JPanel(new GridBagLayout());
 
-		JScrollPane scrollPane = new JScrollPane(panel);
-		scrollPane.setBounds(10, 144, 664, 233);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		getContentPane().add(scrollPane);
+        setLayout(null); 
+        setBounds(0, 100, 684, 255);
+
+
+				
+				panel = new JPanel(new GridBagLayout());
+		
+				JScrollPane scrollPane = new JScrollPane(panel);
+				scrollPane.setBounds(92, 27, 500, 200);
+				scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);	
+				add(scrollPane);
+
 		
 		removeQuiz = new JButton("Delete Quiz");
-		removeQuiz.setBounds(573, 107, 101, 32);
-		removeQuiz.setVisible(false);
-		contentPane.add(removeQuiz);
-		
-		JButton checkDetList = new JButton("Button");
-		checkDetList.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-                   d.getReady(deleteList, "ZYGVHGZH");   
-                   try {
-					d.deleteSQL();
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+		removeQuiz.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+               d.getReady(deleteList, "ZYGVHGZH");   
+               try {
+				d.deleteSQL();
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
-		});
-		checkDetList.setBounds(10, 110, 89, 23);
-		contentPane.add(checkDetList);
-		
+		}});
+	
+		removeQuiz.setBounds(90, 0, 112, 23);
+		removeQuiz.setVisible(false);
+		add(removeQuiz);
+
 		gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         
@@ -125,18 +99,20 @@ public class QuizList extends JFrame {
 			l.loadQuizName();
 			l.loadQA();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        quizList = l.getQuizName();
+        quizList   = l.getQuizName();
         masterList = l.getQuiz();
+        
         for(int i = 0; i < quizList.size(); i++) {
-        	addQuiz(quizList.get(i));
+        	loadQuiz(quizList.get(i));
         }
+        
+        setVisible(false);
 	}
 	
 	
-	private void addQuiz(String n) {
+	public void addQuiz(String n) {
 		JLabel classCode_label = new JLabel("Hello");
         JButton button = new JButton(n);
         JCheckBox box = new JCheckBox();
@@ -155,8 +131,8 @@ public class QuizList extends JFrame {
         
         button.addActionListener(new ActionListener() {        
             public void actionPerformed(ActionEvent e) {  
+            	displayJFrame(); 
             	displayQA(button.getText());
-//            	System.out.println(masterList.size());
         }});
         
         
@@ -177,6 +153,62 @@ public class QuizList extends JFrame {
 
         panel.revalidate();
         panel.repaint();
+	}
+	
+	private void loadQuiz(String n) {
+		JLabel classCode_label = new JLabel("Hello");
+        JButton button = new JButton(n);
+        JCheckBox box = new JCheckBox();
+        
+        box.addActionListener(new ActionListener() {        
+            public void actionPerformed(ActionEvent e) {  
+            	checkSelectedBox();
+        		removeQuiz.addActionListener(new ActionListener() {
+        			public void actionPerformed(ActionEvent e) {  		          
+        					 if(box.isSelected()) 
+        						 deleteQuiz(box,button,classCode_label);
+  	
+        			}});
+
+        }});
+        
+        button.addActionListener(new ActionListener() {        
+            public void actionPerformed(ActionEvent e) { 
+            	displayJFrame(); 
+            	displayQA(button.getText());
+        }});
+        
+        
+        checkBox_Class.add(box);
+        button_Class.add(button);
+        labelCode_Class.add(classCode_label);
+    	
+        gbc.gridx = 0; 
+        gbc.gridy = iJSrollPane++;
+        panel.add(box, gbc);
+        
+        gbc.gridx = 1; 
+        panel.add(button, gbc);
+
+        
+        gbc.gridx = 2; 
+        panel.add(classCode_label, gbc);
+
+        panel.revalidate();
+        panel.repaint();
+	}
+	
+	private void displayJFrame() {
+        teacherClass.setGlassPane(new JPanel() {
+	    private static final long serialVersionUID = -5643729088768657875L;
+        {
+            setOpaque(false); 
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); 
+            addMouseListener(new java.awt.event.MouseAdapter() {}); 
+        }});
+        teacherClass.getGlassPane().setVisible(true);
+    	displayOrEditQuiz = new DisplayOrEditQuiz(teacherClass);
+    	displayOrEditQuiz.setVisible(true);
 	}
 	
 	private void checkSelectedBox() {
@@ -204,6 +236,10 @@ public class QuizList extends JFrame {
 		
 	}
 	
+	public void addMasterList(ArrayList<MainQuiz> masterList) {
+		this.masterList = masterList;
+	}
+	
 	private void displayQA(String name) {
         for(MainQuiz m : masterList) {
         	if(name.equals(m.getName())) {
@@ -219,4 +255,8 @@ public class QuizList extends JFrame {
 		
 
 	}
+
+
+	
+	
 }

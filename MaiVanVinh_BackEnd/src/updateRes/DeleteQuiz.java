@@ -79,6 +79,33 @@ public class DeleteQuiz {
 
 	}
 	
+	public void deleteQuestion(int questionID) throws ClassNotFoundException, SQLException {
+		
+		 Class.forName("com.mysql.cj.jdbc.Driver"); 
+		 StringBuilder sql = new StringBuilder("delete from answer where question_id in ("+questionID+")");
+		 StringBuilder sqlQuestion = new StringBuilder("delete from question where question_id in ("+questionID+")");
+
+	   
+       System.out.println(sql);
+       System.out.println(sqlQuestion);
+
+       try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580")) {	             
+       	 
+       	    try(PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+       	    ps.executeUpdate(); 
+       	    System.out.println("ok");
+	        }
+                          
+            try(PreparedStatement ps = conn.prepareStatement(sqlQuestion.toString())) {
+            ps.executeUpdate(); 
+            System.out.println("ok");
+            ps.close();
+       	    conn.close(); 
+     	    }
+            
+       }
+	}
+	
 	private void getQuizID() throws ClassNotFoundException, SQLException {
 		  StringBuilder sql = new StringBuilder();
 		  sql.append("Select quiz_id from test.quiz where class_code = '"+classCode+"' and title in ('");

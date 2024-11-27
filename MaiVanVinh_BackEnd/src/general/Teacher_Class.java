@@ -13,6 +13,7 @@ import uploadQaA.MainQuestion;
 import uploadQaA.UploadToDatabase;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 
@@ -37,6 +38,8 @@ public class Teacher_Class extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField;
 	private JButton summitName; 
+	private JButton nextQuestion;
+	private JButton previous;
 	private JLabel label; 
 	
 	private JLayeredPane subLayer;
@@ -45,9 +48,11 @@ public class Teacher_Class extends JFrame {
 	private int numOfAnswer = 0;
 	private int check = 0;
 	
-
-	private  ArrayList<JLayeredPane> JLayeredPane_List;
+ 
+	private ArrayList<JLayeredPane> JLayeredPane_List;
+	private ArrayList<Integer> numOfAnsPane;  
 	private int numOfJLayeredPane = 0;
+	private int currentPage = 0;
 	private JButton saveAndBack;
 	
 	private ArrayList<String> QaAList;
@@ -58,6 +63,10 @@ public class Teacher_Class extends JFrame {
 	private ArrayList<String> QuestionList;
 	private ArrayList<String> AnswerList;
 	
+	private QuizList quiz;
+//	private MainQuiz masterList;
+	
+//	private ArrayList<MainQuiz> masterList;
 
 
 	public static void main(String[] args) {
@@ -89,15 +98,17 @@ public class Teacher_Class extends JFrame {
 		JLayeredPane_List = new ArrayList<>();
 		QaAList = new ArrayList<>();
 		isCorrectList = new ArrayList<>();
-		
-		
+//		masterList = new ArrayList<>();
 
+		numOfAnsPane = new ArrayList<>();
 		QuestionList = new ArrayList<>();
 		AnswerList = new ArrayList<>();
 		uploadToDatabase = new UploadToDatabase();
+		numOfAnsPane.add(0);
+		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 425);
+		setSize(700,450);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -157,6 +168,14 @@ public class Teacher_Class extends JFrame {
 
 		JButton listQuiz = new JButton("Quiz List");
 		listQuiz.setBounds(580, 70, 104, 48);
+		listQuiz.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				quiz.setVisible(true);
+				generalLayerPane.setOpaque(false);
+				generalLayerPane.setVisible(false);
+                 
+	    }});
+
 		listQuiz.setFocusable(false);
 		contentPane.add(listQuiz);
 		
@@ -168,6 +187,7 @@ public class Teacher_Class extends JFrame {
 		generalLayerPane.setLayout(null);
 		contentPane.add(generalLayerPane);
 		
+		
 		saveAndBack = new JButton("Save Everything");
 		saveAndBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -178,8 +198,60 @@ public class Teacher_Class extends JFrame {
 		saveAndBack.setVisible(false);
 		contentPane.add(saveAndBack);
 
+		quiz = new QuizList(this);
+		contentPane.add(quiz);
 
+		
+		nextQuestion = new JButton("Next ");
+		nextQuestion.setFocusable(false);
+		nextQuestion.setVisible(false);
+		nextQuestion.setBounds(535, 387, 150, 23);
+		nextQuestion.setFocusable(false);
+		nextQuestion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				previous.setVisible(true);
+				currentPage++;
+				
+				chooseQuestion(2);
+				numOfAnswer = numOfAnsPane.get(numOfJLayeredPane);
 
+				if(numOfAnsPane.get(numOfJLayeredPane) == 0)
+					   check = 0;
+				else
+					   check = 35 * numOfAnsPane.get(numOfJLayeredPane);
+				
+				if(currentPage == numOfQuestion)
+					nextQuestion.setVisible(false);
+			    else
+			    	nextQuestion.setVisible(true);
+		}});
+
+		
+		
+		previous = new JButton("Previous");
+		previous.setFocusable(false);
+		previous.setVisible(false);
+		previous.setBounds(385, 387, 150, 23);
+		previous.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				nextQuestion.setVisible(true);
+				chooseQuestion(1);
+				numOfAnswer = numOfAnsPane.get(numOfJLayeredPane);
+				currentPage--;
+				if(numOfAnsPane.get(numOfJLayeredPane) == 0)
+				   check = 0;
+				else
+				   check = 35 * numOfAnsPane.get(numOfJLayeredPane);
+					
+				if(currentPage == 1)
+				    previous.setVisible(false);
+			    else
+					previous.setVisible(true);
+		}});
+		contentPane.add(previous);
+		contentPane.add(nextQuestion);
+
+		
 	}
 	
 	
@@ -187,16 +259,19 @@ public class Teacher_Class extends JFrame {
 		
 		check = 0;
 		numOfAnswer = 0;
+		currentPage = 0;
 		numOfQuestion = 1;
-		numOfJLayeredPane = 0;
+		
+		quiz.addQuiz(label.getText());
+		nextQuestion.setVisible(false);
+		previous.setVisible(false);
 		
 		addQuestion();
 		showQuestion_Answer();
-//		addQuiz();
 		label.setText("Quiz Name");
+		numOfJLayeredPane = 0;
 		
 		JLayeredPane_List.clear();
-		
 		textField.setVisible(true);
 		subLayer.setVisible(false);
 		summitName.setVisible(true);
@@ -210,7 +285,9 @@ public class Teacher_Class extends JFrame {
 	
 	
 	private void addQuestion() {
+		currentPage++;
 		
+		quiz.setVisible(false);
 		JLayeredPane quizPane = new JLayeredPane();
 		quizPane.setBackground(Color.DARK_GRAY);
 		quizPane.setBounds(10, 11, 664, 233);
@@ -220,18 +297,21 @@ public class Teacher_Class extends JFrame {
 		
 		
 		
-		JTextField titleText = new JTextField();
+		JTextField titleText = new JTextField("");
 		titleText.setBounds(68, 48, 292, 26);
 		quizPane.add(titleText);
      	
      	JButton add = new JButton("Add");
      	add.setBounds(575, 11, 89, 23);
      	add.setFocusable(false);
+
+     	
      	add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {	
-				if(!titleText.getText().equals("")) {	
+				if(!titleText.getText().equals("") && currentPage == numOfQuestion) {	
 				   numOfQuestion++;
 				   numOfJLayeredPane = numOfQuestion - 1;
+				   numOfAnsPane.add(0);
 				   numOfAnswer = 0;
 				   check = 0;
 				   addQuestion();
@@ -262,34 +342,26 @@ public class Teacher_Class extends JFrame {
 		addAnswer.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		addAnswer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(numOfAnswer < 4)
-				   addAnswer(quizPane);
 				numOfAnswer++;
+				
+				if(numOfAnsPane.get(numOfJLayeredPane) < 4) {
+				   numOfAnsPane.set(numOfJLayeredPane, numOfAnswer);
+				   addAnswer(quizPane);
+				}
+				if(numOfAnsPane.get(numOfJLayeredPane) > 3)
+					addAnswer.setVisible(false);
+
+
 			}});
 		addAnswer.setBounds(382, 48, 101, 26);
 		quizPane.add(addAnswer);
+				
+		if(currentPage == 1)
+		   previous.setVisible(false);
+		else
+		   previous.setVisible(true);
+
 		
-		
-		JButton nextQuestion = new JButton("Next ");
-		nextQuestion.setFocusable(false);
-		nextQuestion.setBounds(580, 210, 79, 23);
-		nextQuestion.setFocusable(false);
-		nextQuestion.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {	
-				chooseQuestion(2);
-			}});
-		quizPane.add(nextQuestion);
-		
-		
-		JButton previous = new JButton("Previous");
-		previous.setFocusable(false);
-		previous.setBounds(502, 210, 79, 23);
-		previous.setFocusable(false);
-		previous.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {	
-				chooseQuestion(1);
-			}});
-		quizPane.add(previous);	
 		JLayeredPane_List.add(quizPane);
 		showLayeredPane(quizPane);
 
@@ -304,8 +376,7 @@ public class Teacher_Class extends JFrame {
         	numOfJLayeredPane++;
             showLayeredPane(JLayeredPane_List.get(numOfJLayeredPane)); 
         }
-        
-        
+          
         
 	}
 	
@@ -316,57 +387,153 @@ public class Teacher_Class extends JFrame {
     	generalLayerPane.repaint();            
     }
     
+    private JTextField createTextField(int yOffset) {
+        JTextField textField_2 = new JTextField();
+        textField_2.setBounds(68, 85 + yOffset, 292, 26);
+        return textField_2;
+    }
+    
 	private void addAnswer(JLayeredPane quizPane) {
-		
-		JTextField textField_2 = new JTextField();
-		textField_2.setBounds(68, 85 + check, 292, 26);
-		quizPane.add(textField_2);
-		
         
-		
-		JButton selectionButton = new JButton("Wrong");
-		selectionButton.setFocusable(false);
-		selectionButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		selectionButton.setBounds(382, 87 + check, 101, 26);
-		selectionButton.setFocusable(false);
-		selectionButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(selectionButton.getText().equals("Correct"))
-				   selectionButton.setText("Wrong");
-				else
-				   selectionButton.setText("Correct");
-			}});
-		quizPane.add(selectionButton);
-		
-		check += 35;
+	    int originalYTextField = 85 + check;
+	    int originalYSelectionButton = 87 + check;
+	    int originalYDeleteCheck = 85 + check;
+
+	    JTextField textField_2 = createTextField(check);
+	    
+	    JButton selectionButton = new JButton("Wrong");
+	    selectionButton.setFocusable(false);
+	    selectionButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
+	    selectionButton.setBounds(382, originalYSelectionButton, 101, 26);
+	    selectionButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+             if(selectionButton.getText().equals("Correct"))
+                selectionButton.setText("Wrong");
+             else
+                selectionButton.setText("Correct");
+        }});
+        
+	    
+	
+	    JButton recreateButton = new JButton("Recreate");
+	    recreateButton.setFocusable(false);
+	    recreateButton.setVisible(false);
+	    recreateButton.setBounds(500, originalYSelectionButton, 101, 26);
+	    
+	    JCheckBox deleteCheck = new JCheckBox();
+	    deleteCheck.setFocusable(false);
+	    deleteCheck.setBounds(40, originalYDeleteCheck, 20, 26);
+
+	   
+	    addDeleteFunctionality(recreateButton,textField_2, deleteCheck,
+        selectionButton, originalYTextField, originalYSelectionButton,quizPane);
+
+	    
+	    recreateButton.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+
+	            if (!quizPane.isAncestorOf(textField_2)) {
+	
+	                JTextField newTextField = createTextField(check);
+	                newTextField.setBounds(68, originalYTextField, 292, 26);
+	                
+	
+	                JCheckBox newDeleteCheck = new JCheckBox();
+	                newDeleteCheck.setBounds(40, originalYDeleteCheck, 20, 26);
+	                
+	
+	                JButton newSelectionButton = new JButton("Wrong");
+	                newSelectionButton.setFocusable(false);
+	                newSelectionButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
+	                newSelectionButton.setBounds(382, originalYSelectionButton, 101, 26);
+	                
+	                newSelectionButton.addActionListener(new ActionListener() {
+	                    public void actionPerformed(ActionEvent e) {
+	                        if(newSelectionButton.getText().equals("Correct"))
+	                            newSelectionButton.setText("Wrong");
+	                        else
+	                            newSelectionButton.setText("Correct");
+	                    }
+	                });
+	                
+	                addDeleteFunctionality(recreateButton,newTextField, newDeleteCheck, 
+	                newSelectionButton, originalYTextField, originalYSelectionButton,quizPane);
+	                
+	                recreateButton.setVisible(false);
+
+	                quizPane.add(newTextField);
+	                quizPane.add(newDeleteCheck);
+	                quizPane.add(newSelectionButton);
+	                
+	                quizPane.revalidate();
+	                quizPane.repaint();
+	            }
+	        }
+	    });
+
+
+	    quizPane.add(textField_2);
+	    quizPane.add(selectionButton);
+	    quizPane.add(recreateButton);
+	    quizPane.add(deleteCheck);
+
+	    check += 35;
 	}
 	
+	private void addDeleteFunctionality(JButton recreateButton,JTextField textField, 
+			JCheckBox deleteCheck, 
+            JButton selectionButton, 
+            int originalYTextField, 
+            int originalYSelectionButton,JLayeredPane quizPane) {
+            deleteCheck.addActionListener(event -> {
+                        recreateButton.setVisible(true);
+                        quizPane.remove(textField);
+                        quizPane.remove(deleteCheck);
+                        quizPane.remove(selectionButton);
+                        quizPane.revalidate();
+                        quizPane.repaint();
+                        });
+    }
 	
 	private void showQuestion_Answer() {
 	    int i = 0;
+	    
 		QaAList.clear();
 		isCorrectList.clear();
 		QuestionList.clear();
 		AnswerList.clear();
 		
+		ArrayList<Integer> emptyList = new ArrayList<>();
+
+		
 		for(JLayeredPane check : JLayeredPane_List) {
 			for (Component comp : check.getComponents()) {	
 				if(comp instanceof JTextField) {
-					JTextField text = (JTextField) comp;
-					QaAList.add(text.getText());
-				}getJButton(comp);
+					JTextField text = (JTextField) comp; 
+					   QaAList.add(text.getText()); 
+				}
+				    getJButton(comp);
 			}
 		}
 
-	   
-	   for(String list : QaAList) {
-		   if(isCorrectList.get(i).equals("Title")) 
-			   QuestionList.add(list);
-		   else
-			   AnswerList.add(list);
-		   i++;	    
-	   }getQuestion_Answer(isCorrectList);
 
+
+	   
+	   for(String list : QaAList) {	
+		   
+		   if(isCorrectList.get(i).equals("Title")) 
+			  QuestionList.add(list);
+		   
+		   if(list.isEmpty() && !isCorrectList.get(i).equals("Title"))
+		    	emptyList.add(i-1);
+		   else{
+			  if(!isCorrectList.get(i).equals("Title")) 
+				  AnswerList.add(list);
+		   }i++;		   	    
+	   }
+
+	   getQuestion_Answer(isCorrectList,emptyList);
+ 
 	   
 		
 	}
@@ -375,10 +542,19 @@ public class Teacher_Class extends JFrame {
 	
 
 	
-    private void getQuestion_Answer(ArrayList<String> isCorrect) {
+    private void getQuestion_Answer(ArrayList<String> isCorrect, ArrayList<Integer> emptyList) {
     	
     	     int ansIndex = 0;
     	     int firstCheck = 1;
+    	     
+    	     int n = 0;
+    	     int index = 1;
+    	     int num = -1;
+    	     
+    	     if(emptyList.size() > 0) {
+    	        num = emptyList.get(0);
+    	     }
+    	     
 
    		     ArrayList<MainQuestion> que = new ArrayList<>();    	 	 	 
     		 ArrayList<MainAnswer> ans = new ArrayList<>();  
@@ -387,30 +563,42 @@ public class Teacher_Class extends JFrame {
     	     
     	     for(String option : isCorrect) { 	
     	    	 
-                 if(!option.equals("Title")) {
+                 if(!option.equals("Title") && (n != num) && ansIndex < AnswerList.size()) { 
                     ans.add(new MainAnswer(AnswerList.get(ansIndex++),option));
                  }else if(option.equals("Title") && firstCheck > 1) { 
                 	answers.add(new ArrayList<>(ans));
-                 	ans.clear(); 	    
-                  }
+                 	ans.clear(); 	
+                    n--;
+                 }
+
+                if(n == num && index < emptyList.size())
+                	num = emptyList.get(index++);
+                n++;
                 firstCheck++;  
+                
                 
     	     }
     	     
+
     	     
             for(int j  = 0; j < QuestionList.size() - 1; j++) {
             	if(!QuestionList.get(j).equals(""))
             	   que.add(new MainQuestion(QuestionList.get(j), answers.get(j)));
             }
-    	
+            
+            
              for(MainQuestion question : que) {
             	 System.out.println(question.getQuestion());
             	 for(MainAnswer anss : question.getAns()) {
-                    System.out.println(anss.getOption());
+                    System.out.println(anss.isCorrect());
             	 }
              }
              
-             try {
+
+//            masterList.add(new MainQuiz(label.getText(), new ArrayList<>(que)));
+//            quiz.addMasterList(masterList);
+            
+            try {
 				uploadToDatabase.pushData("ZYGVHGZH",questionName,que);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
@@ -426,10 +614,11 @@ public class Teacher_Class extends JFrame {
 			JButton text = (JButton) c;
                if(text.getText().equals("Add Answer")) 
 				   isCorrectList.add("Title");
-   	
+               
+
 			   if(text.getText().equals("Correct") || text.getText().equals("Wrong")) 
 				   isCorrectList.add(text.getText());
-			   
+   	          
 		}
     	
     }
