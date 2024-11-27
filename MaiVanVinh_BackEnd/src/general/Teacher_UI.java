@@ -67,7 +67,7 @@ public class Teacher_UI{
     private ArrayList<String> deleteList;
     private int numCheckBox = 0;
 
-//    private Teacher_Class teacherQuiz;
+    private Teacher_Class teacherQuiz;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -79,8 +79,8 @@ public class Teacher_UI{
 		 
 		 
 		frame = new JFrame();
+
 		
-//		teacherQuiz = new Teacher_Class();
 		
 	    checkBox_Class = new ArrayList<>();
 	    button_Class = new ArrayList<>();
@@ -93,7 +93,6 @@ public class Teacher_UI{
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
-//		contentPane.add(teacherQuiz);
 		frame.setContentPane(contentPane);
 
 
@@ -240,8 +239,10 @@ public class Teacher_UI{
             
             button.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                       System.out.println(button.getText());
-//                       openTeacherClass();
+                       Teacher_Class.classCode = uniqueClassCode;
+               		   teacherQuiz = new Teacher_Class();
+                       teacherQuiz.setVisible(true);
+                       frame.setVisible(false);
             }});
             
             checkBox_Class.add(box);
@@ -311,7 +312,10 @@ public class Teacher_UI{
             
             button.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                       System.out.println(button.getText());
+                    Teacher_Class.classCode = classCode;
+            		teacherQuiz = new Teacher_Class();
+                    teacherQuiz.setVisible(true);
+                    frame.setVisible(false);
             }});
             
             checkBox_Class.add(box);
@@ -344,6 +348,8 @@ public class Teacher_UI{
         
         
 	}
+	
+	
 	
 	private void deleteClass(JCheckBox box,JButton button,JLabel label) {
 		deleteList.add(button.getText());
@@ -509,11 +515,6 @@ public class Teacher_UI{
 	}
 	
 
-//   private void openTeacherClass() {
-//	    contentPane.setVisible(false);	
-//		teacherQuiz.setVisible(true);
-//		frame.setContentPane(teacherQuiz);
-//   }
    
    public static void returnPage(){
 	   contentPane.setVisible(true);

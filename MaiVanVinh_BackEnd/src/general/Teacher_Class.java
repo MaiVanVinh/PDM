@@ -1,7 +1,6 @@
 package general;
 
 
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +18,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -27,6 +27,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
@@ -64,10 +66,7 @@ public class Teacher_Class extends JFrame {
 	private ArrayList<String> AnswerList;
 	
 	private QuizList quiz;
-//	private MainQuiz masterList;
-	
-//	private ArrayList<MainQuiz> masterList;
-
+	public static String classCode;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -85,16 +84,15 @@ public class Teacher_Class extends JFrame {
 
 
 	
-	
 	public Teacher_Class() {
-
+        System.out.println(classCode);
 		
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		 
+
 		JLayeredPane_List = new ArrayList<>();
 		QaAList = new ArrayList<>();
 		isCorrectList = new ArrayList<>();
@@ -250,10 +248,21 @@ public class Teacher_Class extends JFrame {
 		}});
 		contentPane.add(previous);
 		contentPane.add(nextQuestion);
-
+		setLocationRelativeTo(null);
 		
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE); 
+	       addWindowListener(new WindowAdapter() {
+	        	@Override
+	            public void windowClosing(WindowEvent e) {
+	                Teacher_UI.frame.setVisible(true);
+	                dispose(); 
+	            }
+	        });
+
 	}
 	
+	
+
 	
 	private void clear() {
 		
@@ -599,7 +608,7 @@ public class Teacher_Class extends JFrame {
 //            quiz.addMasterList(masterList);
             
             try {
-				uploadToDatabase.pushData("ZYGVHGZH",questionName,que);
+				uploadToDatabase.pushData(classCode,questionName,que);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
@@ -622,6 +631,6 @@ public class Teacher_Class extends JFrame {
 		}
     	
     }
-	
+
 
 }

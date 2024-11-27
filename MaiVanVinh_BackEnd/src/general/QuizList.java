@@ -38,7 +38,7 @@ public class QuizList extends JPanel {
     private JPanel panel;
     private int iJSrollPane = 0;
     private JButton removeQuiz;
-    private LoadQuiz l = new LoadQuiz("ZYGVHGZH");
+    private LoadQuiz l = new LoadQuiz(Teacher_Class.classCode);
     private ArrayList<MainQuiz> masterList;
     private ArrayList<String> quizList;
     
@@ -78,7 +78,7 @@ public class QuizList extends JPanel {
 		removeQuiz = new JButton("Delete Quiz");
 		removeQuiz.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-               d.getReady(deleteList, "ZYGVHGZH");   
+               d.getReady(deleteList, Teacher_Class.classCode);   
                try {
 				d.deleteSQL();
 			} catch (ClassNotFoundException e1) {
@@ -131,7 +131,7 @@ public class QuizList extends JPanel {
         
         button.addActionListener(new ActionListener() {        
             public void actionPerformed(ActionEvent e) {  
-            	displayJFrame(); 
+            	displayJFrame(button.getText()); 
             	displayQA(button.getText());
         }});
         
@@ -174,7 +174,7 @@ public class QuizList extends JPanel {
         
         button.addActionListener(new ActionListener() {        
             public void actionPerformed(ActionEvent e) { 
-            	displayJFrame(); 
+            	displayJFrame(button.getText()); 
             	displayQA(button.getText());
         }});
         
@@ -198,7 +198,7 @@ public class QuizList extends JPanel {
         panel.repaint();
 	}
 	
-	private void displayJFrame() {
+	private void displayJFrame(String quizName) {
         teacherClass.setGlassPane(new JPanel() {
 	    private static final long serialVersionUID = -5643729088768657875L;
         {
@@ -207,7 +207,7 @@ public class QuizList extends JPanel {
             addMouseListener(new java.awt.event.MouseAdapter() {}); 
         }});
         teacherClass.getGlassPane().setVisible(true);
-    	displayOrEditQuiz = new DisplayOrEditQuiz(teacherClass);
+    	displayOrEditQuiz = new DisplayOrEditQuiz(teacherClass,quizName);
     	displayOrEditQuiz.setVisible(true);
 	}
 	

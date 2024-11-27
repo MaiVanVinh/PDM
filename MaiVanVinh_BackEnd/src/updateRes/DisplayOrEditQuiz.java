@@ -69,7 +69,7 @@ public class DisplayOrEditQuiz extends JFrame {
     private String quizName;
     private int quizID;
     
-    private LoadQuiz l = new LoadQuiz("ZYGVHGZH");
+    private LoadQuiz l = new LoadQuiz(Teacher_Class.classCode);
     private JButton saveChange;
 
     private MainQuestion editQuestion;
@@ -97,7 +97,7 @@ public class DisplayOrEditQuiz extends JFrame {
 
 	
 	
-	public DisplayOrEditQuiz(Teacher_Class teacherClass) {
+	public DisplayOrEditQuiz(Teacher_Class teacherClass,String quizName) {
 
 		
 		try {
@@ -106,7 +106,7 @@ public class DisplayOrEditQuiz extends JFrame {
 			e.printStackTrace();
 		}
 		
-		 
+		this.quizName = quizName; 
 		JLayeredPane_List = new ArrayList<>();
 		QaAList = new ArrayList<>();
 		isCorrectList = new ArrayList<>();
@@ -771,17 +771,12 @@ public class DisplayOrEditQuiz extends JFrame {
 		 }
 		
 
-//		for(MainAnswer a : ans) {
-//			System.out.print(a.isCorrect());
-//			System.out.println(" - "+a.getOption());
-//		}
-//		
 		q = new MainQuestion(questionName,new ArrayList<>(ans));
 		questions.add(q);
 		questionList.add(q);
 		
         try {
-			uploadToDatabase.uploadQuestion(quizID,"ZYGVHGZH","Vinh",questions);
+			uploadToDatabase.uploadQuestion(quizID,Teacher_Class.classCode,"Vinh",questions);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
