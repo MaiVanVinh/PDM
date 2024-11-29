@@ -1,11 +1,12 @@
 package updateRes;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import connectionSQL.MyConnection;
 
 public class DeleteQuiz {
 	
@@ -56,7 +57,7 @@ public class DeleteQuiz {
         System.out.println(sql);
         System.out.println(sqlQuestion);
         System.out.println(sqlQuiz);
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580")) {	             
+        try (Connection conn = MyConnection.getConnection()) {	             
         	 
         	try(PreparedStatement ps = conn.prepareStatement(sql.toString())) {
         	 ps.executeUpdate(); 
@@ -89,7 +90,7 @@ public class DeleteQuiz {
        System.out.println(sql);
        System.out.println(sqlQuestion);
 
-       try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580")) {	             
+       try (Connection conn = MyConnection.getConnection()) {	             
        	 
        	    try(PreparedStatement ps = conn.prepareStatement(sql.toString())) {
        	    ps.executeUpdate(); 
@@ -118,7 +119,7 @@ public class DeleteQuiz {
 		  }sql.append("')");
 	    
 		  
-		  try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+		  try (Connection conn = MyConnection.getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 	         ResultSet rs = ps.executeQuery();	  
 	         while(rs.next()) {

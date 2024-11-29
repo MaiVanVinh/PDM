@@ -1,11 +1,13 @@
-package general;
-
-
+package teacherAccount;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import com.formdev.flatlaf.FlatDarkLaf;
+
+import connectionSQL.MyConnection;
+import general.SignIn_Window;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -18,7 +20,6 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -80,8 +81,6 @@ public class Teacher_UI{
 		 
 		frame = new JFrame();
 
-		
-		
 	    checkBox_Class = new ArrayList<>();
 	    button_Class = new ArrayList<>();
 	    labelCode_Class = new ArrayList<>();
@@ -395,7 +394,7 @@ public class Teacher_UI{
 
 		
 		
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
     		     
         	           if(password.equals(null)) {
@@ -439,7 +438,7 @@ public class Teacher_UI{
 
 		
 		
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
         	     ps.executeUpdate(); 
 			     ps.close();
@@ -459,7 +458,7 @@ public class Teacher_UI{
 
 		
 		
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
         	     ps.setString(1, codetoCheck);
 	             ResultSet rs = ps.executeQuery();
@@ -523,3 +522,4 @@ public class Teacher_UI{
 	
 	
 }
+

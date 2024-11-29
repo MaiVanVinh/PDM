@@ -12,6 +12,10 @@ public class MainAnswer {
 		this.isCorrect = isCorrect;
 	}
 	
+	public MainAnswer(String correctOption) {
+		 this.op = correctOption;
+	}
+	
 	public MainAnswer(int answerID,String option, String isCorrect) {
 		this.op = option;
 		this.isCorrect = isCorrect;

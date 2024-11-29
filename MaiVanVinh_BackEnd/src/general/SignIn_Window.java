@@ -9,7 +9,10 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import connectionSQL.MyConnection;
+import studentAccount.Student_UI;
 import updateRes.LoadCreatedClass;
+import teacherAccount.Teacher_UI;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -26,7 +29,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,7 +51,8 @@ public class SignIn_Window extends JFrame {
 	
     private Teacher_UI teacher_UI;
     private LoadCreatedClass getCreatedClass;
-//    private LoadQuiz l = new LoadQuiz("ZYGVHGZH");
+    
+    private Student_UI student_UI;
     
     
 	public SignIn_Window(MainMenu mainmenu) {
@@ -57,13 +60,12 @@ public class SignIn_Window extends JFrame {
 		 try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		 
 		getCreatedClass = new LoadCreatedClass();
 		teacher_UI = new Teacher_UI(this);
-		Teacher_UI.frame.setVisible(false);
+		
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 530, 353);
@@ -151,8 +153,6 @@ public class SignIn_Window extends JFrame {
     		getCreatedClass.getCreatedClass();
     		Teacher_UI.teacherOwnClass = getCreatedClass.getInfoClass();
     		Teacher_UI.componentClass  = getCreatedClass.getNum();
-//    		l.loadQuiz();
-//    		l.getQuiz();
 			openTeacherUI();
     	}
 
@@ -170,12 +170,17 @@ public class SignIn_Window extends JFrame {
 
    private void summitAction() {
 		try {
+			String selection = (String) comboBox.getSelectedItem();
 			  if(checkLogin( passwordField.getPassword(), (String) comboBox.getSelectedItem())) {
 				  usernameField.setText("");
 				  passwordField.setText("");
 				  comboBox.setSelectedIndex(0);
 				  showPass.setSelected(false);
-				  loadClassToTeacherAccount();
+				  if(selection.equals("Student")) 
+					  initializeStudentAccount();
+				  else 
+				      loadClassToTeacherAccount();
+				  
 				  JOptionPane.showMessageDialog(null, "Login successfully !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
 			  }
 		} catch (HeadlessException | ClassNotFoundException e1) {
@@ -183,7 +188,13 @@ public class SignIn_Window extends JFrame {
 		}
    }
    
-	
+
+   private void initializeStudentAccount() {
+		  student_UI = new Student_UI();
+		  student_UI.nothing();
+		  Student_UI.Studentframe.setVisible(true);
+		  setVisible(false);
+   }
 
    private boolean checkLogin(char[] password, String selection) throws HeadlessException, ClassNotFoundException {
 	   if(checkExistedAccount(usernameField.getText(),password,selection)) {
@@ -199,8 +210,9 @@ public class SignIn_Window extends JFrame {
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
 		    String password = new String(pass);
 	        String sql_student = "SELECT id_student, pass_word FROM test.user_student WHERE username = ?;";
-	        String sql_teacher = "SELECT id_teacher, pass_word FROM test.user_teacher WHERE username = ? ;";
+	        String sql_teacher = "SELECT id_teacher, pass_word FROM test.user_teacher WHERE username = ?;";
 	        String sql = null;
+	        String studentID = "";
 	        id  = null;
 	        
 	        
@@ -213,7 +225,7 @@ public class SignIn_Window extends JFrame {
 	        
 	        
             boolean checkAuth = false;
-	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+	        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	             ps.setString(1, nameToCheck);
@@ -224,14 +236,15 @@ public class SignIn_Window extends JFrame {
 	            	 String storedPassword = rs.getString("pass_word");
 	            	 
 	     	        if(selection.equals("Student"))
-	     	        	 id = rs.getString("id_student");
+	     	        	 studentID = rs.getString("id_student");
 	    	        else
 	    	        	 id = rs.getString("id_teacher");
-	            	 
+	            	
+	     	        
                     if(storedPassword.equals(password)) { 
                     	 checkAuth = true;
                     	 Teacher_UI.teacherID = id;
-                    	 //System.out.println(id);
+                    	 Student_UI.STUDENT_ID = studentID;
                     }
                  }
 	             
@@ -245,7 +258,7 @@ public class SignIn_Window extends JFrame {
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
-
+      
 	  return checkAuth;
 	}
 	

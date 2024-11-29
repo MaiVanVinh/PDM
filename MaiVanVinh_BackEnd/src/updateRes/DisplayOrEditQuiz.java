@@ -9,7 +9,7 @@ import javax.swing.event.DocumentListener;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import general.Teacher_Class;
+import teacherAccount.Teacher_Class;
 import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
 import uploadQaA.MainQuiz;
@@ -79,24 +79,9 @@ public class DisplayOrEditQuiz extends JFrame {
     private boolean checkEmptyQuestion;
     private boolean checkAddNewQuestion;
     private ArrayList<Integer> addNewQuestionListIndex;
-    
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					DisplayOrEditQuiz frame = new DisplayOrEditQuiz();
-//					frame.setVisible(true);
-//					frame.setLocationRelativeTo(null);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+    private JLabel quizName_1;
 
 
-	
-	
 	public DisplayOrEditQuiz(Teacher_Class teacherClass,String quizName) {
 
 		
@@ -111,9 +96,7 @@ public class DisplayOrEditQuiz extends JFrame {
 		QaAList = new ArrayList<>();
 		isCorrectList = new ArrayList<>();
 		masterList = new ArrayList<>();
-		
-//		editAnswerList = new ArrayList<>();
-//		editQuestionList = new ArrayList<>();
+
 
 		numOfAnsPane = new ArrayList<>();
 		QuestionList = new ArrayList<>();
@@ -143,8 +126,10 @@ public class DisplayOrEditQuiz extends JFrame {
 		contentPane.add(subLayer);
 		
 		saveChange = new JButton("Save Change");
-		saveChange.setBounds(293, 51, 104, 23);
+		saveChange.setBounds(294, 92, 104, 23);
 		subLayer.add(saveChange);
+		
+
 		
 
 		
@@ -172,11 +157,6 @@ public class DisplayOrEditQuiz extends JFrame {
 		generalLayerPane.setLayout(null);
 		contentPane.add(generalLayerPane);
 		
-//		quiz = new QuizList();
-//		contentPane.add(quiz);
-		
-
-
 		
 		nextQuestion = new JButton("Next ");
 		nextQuestion.setFocusable(false);
@@ -295,7 +275,6 @@ public class DisplayOrEditQuiz extends JFrame {
 
 	
 	private void loadQuiz() {
-		quizName = "Vinh";
 		for(MainQuiz q : masterList) {
 			if(quizName.equals(q.getName())) {
 				quizID = q.getID();
@@ -308,6 +287,11 @@ public class DisplayOrEditQuiz extends JFrame {
 				}
 			}
 		}
+		
+		quizName_1 = new JLabel(quizName);
+		quizName_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		quizName_1.setBounds(294, 21, 149, 39);
+		subLayer.add(quizName_1);
 		
 
 	}
@@ -712,7 +696,6 @@ public class DisplayOrEditQuiz extends JFrame {
 		int questionID =  questionList.get(numOfJLayeredPane).getID();
 		ArrayList<Integer> questionIDList = new ArrayList<>();
 		UpdateQuiz u = new UpdateQuiz();
-		
 		try {
 			questionIDList = u.getQuestionID(quizID);
 		} catch (ClassNotFoundException e) {
@@ -776,7 +759,7 @@ public class DisplayOrEditQuiz extends JFrame {
 		questionList.add(q);
 		
         try {
-			uploadToDatabase.uploadQuestion(quizID,Teacher_Class.classCode,"Vinh",questions);
+			uploadToDatabase.uploadQuestion(quizID,Teacher_Class.classCode,quizName,questions);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
@@ -787,7 +770,7 @@ public class DisplayOrEditQuiz extends JFrame {
 	private void showQuestion_Answer(int questionID) {
 	    int i = 0;
 	    int index = 0; 
-	    String questionName = null;
+	    String questionName = "";
 	    ArrayList<MainAnswer> ans = new ArrayList<>();   
 
 	    
@@ -826,6 +809,8 @@ public class DisplayOrEditQuiz extends JFrame {
 
        editQuestion.setQuestion(questionID, questionName, new ArrayList<>(ans));
 
+
+       
        
 	     UpdateQuiz u = new UpdateQuiz();
 	     u.getReady(editQuestion, questionID);

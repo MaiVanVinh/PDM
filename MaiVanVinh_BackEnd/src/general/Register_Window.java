@@ -9,6 +9,8 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import connectionSQL.MyConnection;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -22,7 +24,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,6 +47,9 @@ public class Register_Window extends JFrame {
 	
     private boolean checkLength;
     private boolean checkComboBox;
+    private JTextField firstNameInput;
+    private JTextField lastNameInput;
+    private JTextField phoneInput;
     
     
 	public Register_Window(MainMenu mainmenu) {
@@ -60,7 +64,7 @@ public class Register_Window extends JFrame {
 		
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setBounds(100, 100, 530, 353);
+		setBounds(100, 100, 671, 479);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -68,33 +72,33 @@ public class Register_Window extends JFrame {
 		
 		comboBox = new JComboBox<>();
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"", "Teacher", "Student"}));
-		comboBox.setBounds(175, 61, 188, 22);
+		comboBox.setBounds(235, 61, 188, 22);
 		contentPane.add(comboBox);
 		
 		label = new JLabel("You are a ");
 		label.setFont(new Font("Arial", Font.BOLD | Font.ITALIC, 30));
-		label.setBounds(199, 28, 172, 22);
+		label.setBounds(251, 28, 172, 22);
 		contentPane.add(label);
 		
 		userLabel = new JLabel("Username");
 		userLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		userLabel.setBounds(43, 125, 90, 17);
+		userLabel.setBounds(10, 125, 90, 17);
 		contentPane.add(userLabel);
 		
 		passLabel = new JLabel("Password");
 		passLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		passLabel.setBounds(43, 186, 90, 17);
+		passLabel.setBounds(10, 184, 90, 17);
 		contentPane.add(passLabel);
 		
 		usernameField = new JTextField();
-		usernameField.setBounds(175, 127, 188, 20);
+		usernameField.setBounds(110, 127, 188, 20);
 		contentPane.add(usernameField);
 		usernameField.setColumns(10);
 		
 
 		
 		passwordField = new JPasswordField();
-		passwordField.setBounds(175, 186, 188, 20);
+		passwordField.setBounds(110, 186, 188, 20);
 		contentPane.add(passwordField);
 		
 		
@@ -107,7 +111,7 @@ public class Register_Window extends JFrame {
 					passwordField.setEchoChar(('*'));
 			}  
 		});
-		showPass.setBounds(175, 213, 120, 23);
+		showPass.setBounds(110, 214, 120, 23);
 		contentPane.add(showPass);
 		
 		
@@ -116,7 +120,7 @@ public class Register_Window extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				summitAction();
 			}});
-		summit.setBounds(175, 270, 89, 33);
+		summit.setBounds(209, 398, 89, 33);
 		contentPane.add(summit);
 
 		
@@ -131,14 +135,53 @@ public class Register_Window extends JFrame {
 				mainmenu.setVisible(true);
 			}
 		});
-		back.setBounds(274, 270, 89, 33);
+		back.setBounds(361, 398, 89, 33);
 		contentPane.add(back);
+		
+		JLabel firstName = new JLabel("First Name");
+		firstName.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		firstName.setBounds(350, 125, 100, 22);
+		contentPane.add(firstName);
+		
+		firstNameInput = new JTextField();
+		firstNameInput.setBounds(460, 127, 172, 20);
+		contentPane.add(firstNameInput);
+		firstNameInput.setColumns(10);
+		
+		JLabel lastName = new JLabel("Last Name");
+		lastName.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lastName.setBounds(350, 184, 100, 22);
+		contentPane.add(lastName);
+		
+		lastNameInput = new JTextField();
+		lastNameInput.setColumns(10);
+		lastNameInput.setBounds(460, 186, 172, 20);
+		contentPane.add(lastNameInput);
+		
+		JLabel phoneNum = new JLabel("Phone Number");
+		phoneNum.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		phoneNum.setBounds(268, 244, 142, 33);
+		contentPane.add(phoneNum);
+		
+		phoneInput = new JTextField();
+		phoneInput.setColumns(10);
+		phoneInput.setBounds(251, 277, 172, 20);
+		contentPane.add(phoneInput);
 		setVisible(true);
 
 	}
 	
 	
 	private void summitAction() {
+		
+		if(phoneInput.getText().equals("") || lastNameInput.getText().equals("") || firstNameInput.getText().equals("")) {
+			JOptionPane.showMessageDialog(null, "You have to fill up everything !!", "Warning!", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		String lastName = lastNameInput.getText();
+		String firstName = firstNameInput.getText();
+		String phoneNum = phoneInput.getText();
 		
 		checkLength = checkLength(usernameField.getText().length(), passwordField.getPassword().length);
 		checkComboBox = checkcomboBox((String) comboBox.getSelectedItem());
@@ -155,9 +198,12 @@ public class Register_Window extends JFrame {
 		
 			if(checkLength && checkComboBox && checkUsername) {
 				try {
-					passInfo_toDatabase(usernameField.getText(),passwordField.getPassword(),(String) comboBox.getSelectedItem());
+					passInfo_toDatabase(usernameField.getText(),passwordField.getPassword(),(String) comboBox.getSelectedItem(),lastName,firstName,phoneNum);
 					usernameField.setText("");
 					passwordField.setText("");
+					lastNameInput.setText("");
+					firstNameInput.setText("");
+					phoneInput.setText("");
 					comboBox.setSelectedIndex(0);
 					showPass.setSelected(false);
 			    } catch (SQLException e1) {
@@ -168,7 +214,7 @@ public class Register_Window extends JFrame {
 	
 
 	
-	private void passInfo_toDatabase(String name, char[] pass, String selection) throws SQLException {
+	private void passInfo_toDatabase(String name, char[] pass, String selection,String firstName,String lastName,String phoneNum) throws SQLException {
 		
 
 		String password = new String(pass);
@@ -176,15 +222,18 @@ public class Register_Window extends JFrame {
 		try {
 			
 			     Class.forName("com.mysql.cj.jdbc.Driver");
-			     Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+			     Connection connection = MyConnection.getConnection();
 			     
 			     StringBuilder query = new StringBuilder();
-			     query.append("INSERT INTO user_"+selection.toLowerCase()+" (username, pass_word) VALUES (?,?)");
+			     query.append("INSERT INTO user_"+selection.toLowerCase()+" (username, pass_word,firstName,lastName,phoneNumber) VALUES (?,?,?,?,?)");
 			     
 			     PreparedStatement ps = connection.prepareStatement(query.toString());
 			
 			     ps.setString(1, name);
 			     ps.setString(2, password);
+			     ps.setString(3, firstName);
+			     ps.setString(4, lastName);
+			     ps.setString(5, phoneNum);
 			     
 			     ps.executeUpdate(); 
 			     JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);
@@ -213,7 +262,7 @@ public class Register_Window extends JFrame {
 	      
 	        
             boolean checkExist = true;
-	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+	        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	             ps.setString(1, nameToCheck);
@@ -262,5 +311,4 @@ public class Register_Window extends JFrame {
 		}
 		return true;
 	}
-
 }

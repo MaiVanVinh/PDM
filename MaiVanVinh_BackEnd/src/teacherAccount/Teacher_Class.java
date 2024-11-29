@@ -1,10 +1,8 @@
-package general;
-
+package teacherAccount;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import uploadQaA.MainAnswer;
@@ -125,7 +123,7 @@ public class Teacher_Class extends JFrame {
 		label = new JLabel("Quiz Name");
 		label.setForeground(Color.WHITE);
 		label.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		label.setBounds(75, 0, 149, 49);
+		label.setBounds(75, 0, 200, 49);
 		subLayer.add(label);
 		
 		/*****************************************/
@@ -148,16 +146,7 @@ public class Teacher_Class extends JFrame {
 		summitName.setFocusable(false);
 		summitName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!textField.getText().isEmpty()) {
-					 questionName = textField.getText();
-					 generalLayerPane.setVisible(true);
-					 saveAndBack.setVisible(true);
-					 summitName.setVisible(false);
-					 textField.setVisible(false);					 
-					 label.setText(questionName);
-					 textField.setText(""); 
-				     addQuestion();		     
-				}     
+				  checkDuplicatedQuiz(textField.getText());
 			}});
 		
 		summitName.setBounds(183, 54, 89, 27);
@@ -261,25 +250,52 @@ public class Teacher_Class extends JFrame {
 
 	}
 	
+	private void checkDuplicatedQuiz(String quizName) {
+		try {
+			if(!CheckDuplicatedQuiz.checkDuplicated(classCode, quizName)) {
+			   if(!textField.getText().isEmpty()) {
+				    questionName = textField.getText();
+				    generalLayerPane.setVisible(true);
+				    saveAndBack.setVisible(true);
+				    summitName.setVisible(false);
+				    textField.setVisible(false);					 
+				    label.setText(questionName);
+				    textField.setText(""); 
+			        addQuestion();		     
+			    }  
+			}else
+				JOptionPane.showMessageDialog(null, "Your quiz name is already existed", "Warning!", JOptionPane.WARNING_MESSAGE);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	
 
 	
 	private void clear() {
+
+		quiz.addQuiz(label.getText());
+
+		
+		addQuestion();
+		showQuestion_Answer();
 		
 		check = 0;
 		numOfAnswer = 0;
 		currentPage = 0;
 		numOfQuestion = 1;
 		
-		quiz.addQuiz(label.getText());
+		label.setText("Quiz Name");
+		numOfJLayeredPane = 0;
+		generalLayerPane.removeAll();
+    	generalLayerPane.revalidate();        
+    	generalLayerPane.repaint();  
+		
 		nextQuestion.setVisible(false);
 		previous.setVisible(false);
 		
-		addQuestion();
-		showQuestion_Answer();
-		label.setText("Quiz Name");
-		numOfJLayeredPane = 0;
-		
+		numOfAnsPane.clear();
+		numOfAnsPane.add(0);
 		JLayeredPane_List.clear();
 		textField.setVisible(true);
 		subLayer.setVisible(false);

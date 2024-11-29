@@ -1,12 +1,12 @@
 package updateRes;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import connectionSQL.MyConnection;
 import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
 
@@ -41,15 +41,15 @@ public class UpdateQuiz {
 		MainQuestion q = questions.get(0);
 		
 		getPreviousAnswerIDData();
-		
+		System.out.println("num: "+questions.get(0).getAns().size());
 		if(questions.get(0).getAns().size() > previousAnswerID.size()) 
 			generateInsertSQL();
-		else
+		else	
 		    generateSQL();
 		
-
+       
 	
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580")) {	             
+		try (Connection conn = MyConnection.getConnection()) {	             
        	     
 			 if(!needAdd && !deleteAll) {
         	   try(PreparedStatement ps = conn.prepareStatement(SQL.get(0))) {
@@ -59,19 +59,29 @@ public class UpdateQuiz {
 			 }
 			 
         	 if(needAdd) {
-        	     try(PreparedStatement ps = conn.prepareStatement(SQL.get(0))) {
-        	     System.out.println(SQL.get(0)); 	 
-                 ps.executeUpdate(); 
-                 System.out.println("ok"); 
-        	     }	 
-        	     for(MainAnswer a : q.getAns()) {
-                    try(PreparedStatement ps = conn.prepareStatement(sqlInsert.toString())){
-                    ps.setInt(1, this.questionID);
-                    ps.setString(2, a.getOption());
-                    ps.setString(3, a.isCorrect());
-                    ps.executeUpdate();
-                    }
-        	     }needAdd = false; needDelete = false;
+        		 try (PreparedStatement ps = conn.prepareStatement(SQL.get(0))) {
+        			    System.out.println(SQL.get(0));
+        			    ps.executeUpdate();
+        			    System.out.println("ok");
+        			} catch (SQLException e) {
+        			    e.printStackTrace(); // Log the exception for debugging purposes
+        			}
+
+        			for (MainAnswer a : q.getAns()) {
+        			    try (PreparedStatement psInsert = conn.prepareStatement(sqlInsert.toString())) {
+        			        psInsert.setInt(1, this.questionID);
+        			        psInsert.setString(2, a.getOption());
+        			        psInsert.setString(3, a.isCorrect()); // Convert boolean to String
+        			        psInsert.executeUpdate();
+        			    } catch (SQLException e) {
+        			        e.printStackTrace(); // Log exceptions occurring in this block
+        			    }
+        			}
+
+        			// Resetting flags (if needed)
+        			needAdd = false;
+        			needDelete = false;
+
         	 }
         	 
              if(needDelete) {              
@@ -83,8 +93,6 @@ public class UpdateQuiz {
              
              conn.close();
         }
-		System.out.println(sqlInsert.toString());
-		System.out.println(SQL.get(0));
 	}
 	
  
@@ -93,7 +101,7 @@ public class UpdateQuiz {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
 		String sql = "Select answer_id from test.answer where question_id = "+this.questionID;
 
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+		try (Connection conn = MyConnection.getConnection();
 		        PreparedStatement stmt = conn.prepareStatement(sql)) {
 	            try (ResultSet rs = stmt.executeQuery()) {
 	             while (rs.next()) {
@@ -112,7 +120,7 @@ public class UpdateQuiz {
 		
 		StringBuilder sqlDelete = new StringBuilder();
 		sqlDelete.append("Delete from test.answer where question_id = "+this.questionID+" and answer_id in ( ");
-		
+        
 		   if(questions.get(0).getAns().size() > previousAnswerID.size()) {
 			   needAdd = true;
 			   needDelete = false;
@@ -133,7 +141,18 @@ public class UpdateQuiz {
 		
 		StringBuilder sqlDelete = new StringBuilder();
 		sqlDelete.append("Delete from test.answer where question_id = "+this.questionID+" and answer_id in ( ");
-
+        
+		if(questions.get(0).getAns().size() == previousAnswerID.size()) {
+            for(int index = 0; index < previousAnswerID.size(); index++) {
+         	   int size = previousAnswerID.size();
+         	   sqlDelete.append(previousAnswerID.get(index));
+         	   if(index < size - 1)
+         		   sqlDelete.append(",");
+            }sqlDelete.append(")");
+            SQL.add(sqlDelete.toString());
+            needAdd = true;
+            return;
+		}
 		
 		   int i = 0;
 		   for(MainQuestion q : questions) {
@@ -159,14 +178,17 @@ public class UpdateQuiz {
 
 		   if(questions.get(0).getAns().size() < previousAnswerID.size()) {
 			   int loop = previousAnswerID.size() - questions.get(0).getAns().size();
-			   int n = (previousAnswerID.size() - loop) + 1;
+			   int n = (previousAnswerID.size() - loop);
 			   if(loop == previousAnswerID.size())
 				   deleteAll = true;
 			   else
 				   deleteAll = false;
 			   
 			   for(int m = 0; m < loop; m++) {
-				   deleteList.add(previousAnswerID.get(n--));
+				   if(n >= 0 && !deleteAll)
+				      deleteList.add(previousAnswerID.get(n--));
+				   if(deleteAll)
+					   deleteList.add(previousAnswerID.get(m));
 			   }
 		   }
 		   
@@ -195,11 +217,10 @@ public class UpdateQuiz {
 		String sql = "Select question_id from test.question where quiz_id =" + quizID;
 		
 
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","maytinhcasio580");
+		try (Connection conn = MyConnection.getConnection();
 		        PreparedStatement stmt = conn.prepareStatement(sql)) {
 	            try (ResultSet rs = stmt.executeQuery()) {
-	             while (rs.next()) {
-	            	 System.out.println("ID :" + rs.getInt("question_id"));
+	             while (rs.next()) {	            
 	            	 questionIDList.add(rs.getInt("question_id"));
 	             }
 	    
