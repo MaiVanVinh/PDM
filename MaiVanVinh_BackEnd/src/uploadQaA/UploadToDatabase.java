@@ -17,10 +17,10 @@ import java.sql.Statement;
 
 public class UploadToDatabase {
 	
-	public void pushData(String classCode,String title, ArrayList<MainQuestion> questions) throws ClassNotFoundException, SQLException {
+	public void pushData(String courseCode,String title, ArrayList<MainQuestion> questions,String duration) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String insertQuiz = "INSERT INTO Quiz (title,class_code) VALUES (?,?);";
-		String sqlQue = ("INSERT INTO Question (quiz_id, question_text) VALUES (?,?);");
+		String insertQuiz = "INSERT INTO Exam (title,course_code,duration) VALUES (?,?,?);";
+		String sqlQue = ("INSERT INTO Question (exam_id, question_text) VALUES (?,?);");
 		String sqlAns = ("INSERT INTO Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
 		boolean isCorrect = false;
 		
@@ -29,7 +29,8 @@ public class UploadToDatabase {
         // Insert quiz
         PreparedStatement quizStmt = MyConnection.getConnection().prepareStatement(insertQuiz,Statement.RETURN_GENERATED_KEYS);
         quizStmt.setString(1, title);
-        quizStmt.setString(2, classCode);
+        quizStmt.setString(2, courseCode);
+        quizStmt.setString(3, duration);
         quizStmt.executeUpdate();
         
 
@@ -73,7 +74,7 @@ public class UploadToDatabase {
 	
 	public void uploadQuestion(int quizID,String classCode,String title, ArrayList<MainQuestion> questions) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String sqlQue = ("INSERT INTO Question (quiz_id, question_text) VALUES (?,?);");
+		String sqlQue = ("INSERT INTO Question (exam_id, question_text) VALUES (?,?);");
 		String sqlAns = ("INSERT INTO Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
 		boolean isCorrect = false;
 		
@@ -106,7 +107,7 @@ public class UploadToDatabase {
 	
 	public static void uploadStudentQuizScore(int score,String quizName) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "Insert into student_quiz(student_id,quiz_id,grade,quiz_name) Values (?,?,?,?)";
+		String sql = "Insert into student_exam(student_id,exam_id,grade,exam_name) Values (?,?,?,?)";
 		String studentID = Student_UI.STUDENT_ID;
 //		int classID = ShowStudentQuiz.CLASS_ID;
 		int quizID = DoTheQuizPane.QUIZ_ID;

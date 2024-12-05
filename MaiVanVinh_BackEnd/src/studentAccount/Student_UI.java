@@ -83,7 +83,7 @@ public class Student_UI{
 		summit.setBounds(94, 71, 89, 20);
 		layeredPane.add(summit);
 		
-		JLabel classCode = new JLabel("Class code");
+		JLabel classCode = new JLabel("Course");
 		classCode.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		classCode.setBounds(28, 12, 79, 14);
 		layeredPane.add(classCode);
@@ -93,7 +93,7 @@ public class Student_UI{
 		pass.setBounds(28, 43, 68, 14);
 		layeredPane.add(pass);
 		
-		JButton studentClass = new JButton("Your Class");
+		JButton studentClass = new JButton("Your Course");
 		studentClass.setFocusable(false);
 		studentClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -105,7 +105,7 @@ public class Student_UI{
 		
 		layeredPane.setVisible(false);
 		
-		JButton joinClass = new JButton("Join Class");
+		JButton joinClass = new JButton("Join Course");
 		joinClass.setFocusable(false);
 		joinClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -159,7 +159,7 @@ public class Student_UI{
 		if(check)
 			addStudentToClass(classCode,classID,className);
 		else
-			JOptionPane.showMessageDialog(null, "The class does not exist", "Warning!", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "The course does not exist", "Warning!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	
@@ -170,7 +170,7 @@ public class Student_UI{
 
 		try {
 			if(joinClass.checkAvailability(STUDENT_ID, classID))
-				JOptionPane.showMessageDialog(null, "You are in this class already !", "Announcement!", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, "You are in this course already !", "Announcement!", JOptionPane.INFORMATION_MESSAGE);
 			else
 			  check = joinClass.addStudentToClass(STUDENT_ID, classID,className);
 		} catch (ClassNotFoundException e) {

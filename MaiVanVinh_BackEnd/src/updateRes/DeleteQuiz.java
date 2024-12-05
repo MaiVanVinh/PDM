@@ -30,8 +30,8 @@ public class DeleteQuiz {
 		
 		 Class.forName("com.mysql.cj.jdbc.Driver"); 
 		 StringBuilder sql = new StringBuilder("delete from answer where question_id in (");
-		 StringBuilder sqlQuestion = new StringBuilder("delete from question where quiz_id in (");
-		 StringBuilder sqlQuiz= new StringBuilder("delete from quiz where class_code = '"+classCode+"' and title in ('");
+		 StringBuilder sqlQuestion = new StringBuilder("delete from question where exam_id in (");
+		 StringBuilder sqlQuiz= new StringBuilder("delete from exam where course_code = '"+classCode+"' and title in ('");
 	     getQuizID();
 	     
           for(int i = 0; i < questionId.size(); i++) {
@@ -109,7 +109,7 @@ public class DeleteQuiz {
 	
 	private void getQuizID() throws ClassNotFoundException, SQLException {
 		  StringBuilder sql = new StringBuilder();
-		  sql.append("Select quiz_id from test.quiz where class_code = '"+classCode+"' and title in ('");
+		  sql.append("Select exam_id from test.exam where course_code = '"+classCode+"' and title in ('");
 		
 		  for(int i = 0; i < deleteList.size(); i++) {
 			  sql.append(deleteList.get(i));
@@ -123,7 +123,7 @@ public class DeleteQuiz {
 	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 	         ResultSet rs = ps.executeQuery();	  
 	         while(rs.next()) {
-                quizId.add(rs.getInt("quiz_id")); 
+                quizId.add(rs.getInt("exam_id")); 
 	         }
 	         getQuestionID(conn);
 	    
@@ -134,7 +134,7 @@ public class DeleteQuiz {
 	
 	private void getQuestionID(Connection c) throws SQLException {
 		StringBuilder sql = new StringBuilder();
-		sql.append("Select question_id from test.question where quiz_id in (");
+		sql.append("Select question_id from test.question where exam_id in (");
 		
 		for(int i = 0; i < quizId.size(); i++) {
 			sql.append(quizId.get(i));

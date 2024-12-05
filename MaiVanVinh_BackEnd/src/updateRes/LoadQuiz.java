@@ -14,6 +14,7 @@ import uploadQaA.MainQuiz;
 public class LoadQuiz {
 
 	private String code;
+	private String duration;
 	private ArrayList<String> quizName;
 	private ArrayList<MainQuiz> masterList;
 	private ArrayList<MainQuestion> list;
@@ -34,7 +35,7 @@ public class LoadQuiz {
 	
 	public void loadQuizName() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT quiz_id,title FROM test.quiz WHERE class_code = ?;";
+		String query = "SELECT exam_id,title FROM test.exam WHERE course_code = ?;";
 		
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -55,16 +56,16 @@ public class LoadQuiz {
 	
 	public void loadOnlyQuiz(String title) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT title,quiz_id, class_code FROM test.quiz WHERE title = '"+title+"' and class_code = ?;";
+		String query = "SELECT title,exam_id,duration, course_code FROM test.exam WHERE title = '"+title+"' and course_code = ?;";
 
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, code);
             try (ResultSet rs = stmt.executeQuery()) {
                 if(rs.next()) {
-                int id = rs.getInt("quiz_id");
+                int id = rs.getInt("exam_id");
                 questions(id);
-                masterList.add(new MainQuiz(rs.getInt("quiz_id"),rs.getString("title"),new ArrayList<>(list)));
+                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration")));
                 list.clear();
               }
 
@@ -79,16 +80,17 @@ public class LoadQuiz {
 	
 	public void loadQA() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT title, quiz_id, class_code FROM test.quiz WHERE class_code = ?;";
+		String query = "SELECT title, exam_id,duration, course_code FROM test.exam WHERE course_code = ?;";
 		
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, code);
             try (ResultSet rs = stmt.executeQuery()) {
               while (rs.next()) {
-                int id = rs.getInt("quiz_id");
+                int id = rs.getInt("exam_id");
+                duration = rs.getString("duration");
                 questions(id);
-                masterList.add(new MainQuiz(rs.getInt("quiz_id"),rs.getString("title"),new ArrayList<>(list)));
+                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),duration));
                 list.clear();
               }
 
@@ -103,7 +105,7 @@ public class LoadQuiz {
 	
 	public void questions(int quizID) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String questionQuery = "SELECT question_id,question_text FROM test.question WHERE quiz_id = ?;";
+		String questionQuery = "SELECT question_id,question_text FROM test.question WHERE exam_id = ?;";
 		int i = 0;
 		
 		try (Connection conn = MyConnection.getConnection();
@@ -144,7 +146,7 @@ public class LoadQuiz {
 
 	public void loadStudentQuizName() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT quiz_id,title FROM test.quiz WHERE class_code = ?;";
+		String query = "SELECT exam_id,title FROM test.exam WHERE course_code = ?;";
 		
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -163,15 +165,15 @@ public class LoadQuiz {
 	
 	public void loadStudentQuizContent() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "Select quiz_id, title from test.quiz where class_code = '"+code+"'";
+		String sql = "Select exam_id,duration, title from test.exam where course_code = '"+code+"'";
 		
 		try (Connection conn = MyConnection.getConnection();
 		        PreparedStatement stmt = conn.prepareStatement(sql)) {
 	            try (ResultSet rs = stmt.executeQuery()) {
 	              while (rs.next()) {
-	                int id = rs.getInt("quiz_id");
+	                int id = rs.getInt("exam_id");
 	                questions(id);
-	                masterList.add(new MainQuiz(rs.getInt("quiz_id"),rs.getString("title"),new ArrayList<>(list)));
+	                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration")));
 	                list.clear();
 	              }
 
@@ -185,13 +187,13 @@ public class LoadQuiz {
 	
 	public int getClassID(String classCode) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "Select id_class from test.class where class_code = '"+classCode+"'";
+		String sql = "Select id_course from test.course where course_code = '"+classCode+"'";
 		int id = 0;
 		try (Connection conn = MyConnection.getConnection();
 		        PreparedStatement stmt = conn.prepareStatement(sql)) {
 	            try (ResultSet rs = stmt.executeQuery()) {
 	              if(rs.next()) 
-	                id = rs.getInt("id_class");    
+	                id = rs.getInt("id_course");    
 	            }
 	           } catch (SQLException e) {
 	            e.printStackTrace();
@@ -214,6 +216,10 @@ public class LoadQuiz {
 	
 	public String getCode() {
 		return code;
+	}
+	
+	public String getDuration() {
+		return duration;
 	}
 	
 	public void clear() {

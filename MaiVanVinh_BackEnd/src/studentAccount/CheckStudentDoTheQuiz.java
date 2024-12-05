@@ -11,8 +11,8 @@ public class CheckStudentDoTheQuiz {
 	
 	public static int checkStudentQuiz(String studentID,int classID,String quizName) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "select grade from test.student_quiz "
-		+ "where student_id = "+studentID+" and quiz_name = '"+quizName+"'";
+		String sql = "select grade from test.student_exam "
+		+ "where student_id = "+studentID+" and exam_name = '"+quizName+"'";
 	    int score = -1;
 
 		try {	

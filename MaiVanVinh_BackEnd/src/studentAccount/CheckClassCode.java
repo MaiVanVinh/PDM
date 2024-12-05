@@ -23,7 +23,7 @@ public class CheckClassCode {
 	
 	public boolean checkDatabase(String classCode, String pass) throws ClassNotFoundException {
 		 Class.forName("com.mysql.cj.jdbc.Driver"); 
-	     String sql = "SELECT id_class, class_name, pass_word FROM test.class WHERE class_code = '"+classCode+"'";
+	     String sql = "SELECT id_course, course_name, pass_word FROM test.course WHERE course_code = '"+classCode+"'";
          String temp1 = null;
 
 	     
@@ -32,8 +32,8 @@ public class CheckClassCode {
 	             ResultSet rs = ps.executeQuery();
                  if(rs.next()) { 
                 	temp1 = rs.getString("pass_word");
-                	classID = rs.getInt("id_class");
-                	className = rs.getString("class_name");
+                	classID = rs.getInt("id_course");
+                	className = rs.getString("course_name");
                  }else 
                 	return false; 
 
@@ -54,7 +54,7 @@ public class CheckClassCode {
 	public boolean checkAvailability(String studentID, int classID) throws ClassNotFoundException {
 
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-	    String sql = "SELECT class_name, student_id, class_id FROM test.student_class WHERE student_id = "+studentID+" and class_id = "+classID;
+	    String sql = "SELECT course_name, student_id, course_id FROM test.student_course WHERE student_id = "+studentID+" and course_id = "+classID;
         boolean check = false;
 	     
 	        try (Connection conn = MyConnection.getConnection();
@@ -75,19 +75,19 @@ public class CheckClassCode {
 	
 	public boolean addStudentToClass(String studentID, int classID,String className) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-	    String insertQuery = "INSERT INTO Student_Class (student_id, class_id, class_name) VALUES ("+studentID+","+classID+",'"+className+"')";
+	    String insertQuery = "INSERT INTO student_course (student_id, course_id, course_name) VALUES ("+studentID+","+classID+",'"+className+"')";
         System.out.println(studentID);
 	    try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement ps = conn.prepareStatement(insertQuery)) {
 	        int rowsInserted = ps.executeUpdate();
 	        if (rowsInserted > 0) {
-	            System.out.println("Student ID " + studentID + " successfully added to Class ID " + classID + " Class Name: "+className);
+	            System.out.println("Student ID " + studentID + " successfully added to Course ID " + classID + " Course Name: "+className);
 	            return true;
 	        }
 
 	    } catch (SQLException e) {
 	        
-	        System.err.println("Error inserting Student ID " + studentID + " into Class ID " + classID+ " Class Name: "+className);
+	        System.err.println("Error inserting Student ID " + studentID + " into Course ID " + classID+ " Course Name: "+className);
 	        e.printStackTrace();
 	    }
 

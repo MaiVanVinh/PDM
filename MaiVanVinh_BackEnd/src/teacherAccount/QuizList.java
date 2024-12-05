@@ -75,7 +75,7 @@ public class QuizList extends JPanel {
 				add(scrollPane);
 
 		
-		removeQuiz = new JButton("Delete Quiz");
+		removeQuiz = new JButton("Delete Exam");
 		removeQuiz.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
                d.getReady(deleteList, Teacher_Class.classCode);   

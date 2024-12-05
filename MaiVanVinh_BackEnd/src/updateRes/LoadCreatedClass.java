@@ -29,7 +29,7 @@ public class LoadCreatedClass {
 	 public void getCreatedClass() throws ClassNotFoundException {
 
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
-	        String query = "SELECT class_code, class_name, pass_word FROM test.class WHERE teacher_id = "+ID;
+	        String query = "SELECT course_code, course_name, pass_word FROM test.course WHERE teacher_id = "+ID;
 
 	        try {
 	            
@@ -41,8 +41,8 @@ public class LoadCreatedClass {
 
 	            while (rs.next()) {
 	            	numberOfComponents += 3;
-	                String tempContainer = rs.getString("class_code");
-	                String tempContainer1 = rs.getString("class_name");
+	                String tempContainer = rs.getString("course_code");
+	                String tempContainer1 = rs.getString("course_name");
 	                String tempContainer2 = rs.getString("pass_word");
 	                
 	                classInfo.add(tempContainer);
@@ -66,7 +66,7 @@ public class LoadCreatedClass {
 	 
 	 public ArrayList<String> loadStudentClass(String studentID) throws ClassNotFoundException {
 		  Class.forName("com.mysql.cj.jdbc.Driver"); 
-	      String query = "SELECT class_id, class_name FROM test.student_class WHERE student_id = "+studentID;
+	      String query = "SELECT course_id, course_name FROM test.student_course WHERE student_id = "+studentID;
 	      ArrayList<String> studentClass = new ArrayList<>();
 	      String classCode = "";
           classes.clear();
@@ -80,9 +80,9 @@ public class LoadCreatedClass {
 	            ResultSet rs = st.executeQuery();
 
 	            while (rs.next()) {
-	            	studentClass.add(rs.getString("class_name"));
-	            	classCode = getClassCode(rs.getInt("class_id"),rs.getString("class_name"));
-	            	classes.put(rs.getString("class_name"),classCode);
+	            	studentClass.add(rs.getString("course_name"));
+	            	classCode = getClassCode(rs.getInt("course_id"),rs.getString("course_name"));
+	            	classes.put(rs.getString("course_name"),classCode);
 	            }
 	           
 	            rs.close();
@@ -98,7 +98,7 @@ public class LoadCreatedClass {
 	 
 	 private String getClassCode(int classID, String className) throws ClassNotFoundException {
 		 Class.forName("com.mysql.cj.jdbc.Driver"); 
-	     String query = "SELECT class_code FROM test.class WHERE id_class = "+classID+" and class_name = '"+className+"'";
+	     String query = "SELECT course_code FROM test.course WHERE id_course = "+classID+" and course_name = '"+className+"'";
          String code = "";
 	        try {
 	            
@@ -109,7 +109,7 @@ public class LoadCreatedClass {
 	            ResultSet rs = st.executeQuery();
 
 	            if(rs.next()) {
-	            	code = rs.getString("class_code");
+	            	code = rs.getString("course_code");
 	            }
 
 	        } catch (SQLException e) {

@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -69,6 +70,7 @@ public class Teacher_UI{
     private int numCheckBox = 0;
 
     private Teacher_Class teacherQuiz;
+    private String semester;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -115,11 +117,11 @@ public class Teacher_UI{
 		contentPane.add(createClass_panel);
 		
 		
-		teacher_class = new JLabel("Your class");
+		teacher_class = new JLabel("Your course");
 		teacher_class.setBounds(10, 86, 157, 30);
 		contentPane.add(teacher_class);
 		
-		createClass = new JButton("Create class");
+		createClass = new JButton("Create course");
 		createClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createNewClassButton();
@@ -142,7 +144,7 @@ public class Teacher_UI{
 		createClass_panel.add(passwordField);
 		
 		
-		name_CreateClass = new JLabel("Class Name");
+		name_CreateClass = new JLabel("Course Name");
 		name_CreateClass.setBounds(10, 16, 92, 20);
 		name_CreateClass.setVisible(false);
 		createClass_panel.add(name_CreateClass);
@@ -179,7 +181,7 @@ public class Teacher_UI{
 		showPass.setVisible(false);
 		createClass_panel.add(showPass);
 		
-		removeClass = new JButton("Delete Class");
+		removeClass = new JButton("Delete Course");
 		removeClass.setVisible(false);
 
 		removeClass.setBounds(517, 78, 157, 38);
@@ -194,7 +196,7 @@ public class Teacher_UI{
 	try {
 		    
 			if(!checkDuplicateClass(textField.getText()))
-				JOptionPane.showMessageDialog(null, "Your class name is invalid", "Warning!", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Your course name is invalid", "Warning!", JOptionPane.WARNING_MESSAGE);
 			else {
 			   if(generateUniqueCode())
 			        pushInfotoSQL();
@@ -374,7 +376,22 @@ public class Teacher_UI{
 		pass_CreatClass.setVisible(true);
 	}
 	
-	
+	private int autoCalculateAcademicYear() {
+        LocalDate currentDate = LocalDate.now();
+        semester = "";
+
+        int month = currentDate.getMonthValue();
+        int year = currentDate.getYear();
+        
+        if( (month >= 9 && month <=12) || month == 1 ) 
+        	semester = "Semester 1";
+        else if(month >= 2 && month <= 6) 
+        	semester = "Semester 2";
+        else
+        	semester = "Semester 3";
+        
+        return year;
+	}
 	
 	
 	private void pushInfotoSQL() throws ClassNotFoundException {
@@ -384,11 +401,12 @@ public class Teacher_UI{
 		String nameClass = new String(textField.getText());
 		String password  = new String(pass);
 		String sql;
+		int academicYear = autoCalculateAcademicYear();
 		
 		if(!password.equals(null)) {
-		    sql = "INSERT INTO class(class_code,class_name,pass_word,teacher_id) VALUES (?,?,?,?)";
+		    sql = "INSERT INTO course(course_code,course_name,pass_word,teacher_id,academic_year,semester) VALUES (?,?,?,?,?,?)";
 		}else {
-		    sql = "INSERT INTO class(class_code,class_name,teacher_id) VALUES (?,?,?)";
+		    sql = "INSERT INTO course(course_code,course_name,teacher_id,academic_year,semester) VALUES (?,?,?,?,?)";
 		}
 		
 
@@ -401,11 +419,15 @@ public class Teacher_UI{
 		                    ps.setString(1, uniqueClassCode);
 		                    ps.setString(2, nameClass);
 		                    ps.setString(3, teacherID);
+		                    ps.setInt(4, academicYear);
+		                    ps.setString(5, semester);
        	               }else {
 		                    ps.setString(1, uniqueClassCode);
 		                    ps.setString(2, nameClass);
 		                    ps.setString(3, password);
 		                    ps.setString(4, teacherID);
+		                    ps.setInt(5, academicYear);
+		                    ps.setString(6, semester);
        	               }
         	     ps.executeUpdate(); 
 			     ps.close();
@@ -428,7 +450,7 @@ public class Teacher_UI{
 	private void deleteDataSQL() throws ClassNotFoundException {
 		
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		StringBuilder sql = new StringBuilder("delete from class where class_name in (");
+		StringBuilder sql = new StringBuilder("delete from course where course_name in (");
 		
         for(int i = 0; i < deleteList.size(); i++) {
         	sql.append("'"+deleteList.get(i)+"',");
@@ -454,7 +476,7 @@ public class Teacher_UI{
 	private boolean checkUniqueCode(String codetoCheck) throws ClassNotFoundException {
 		
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String sql = "SELECT class_code FROM test.class WHERE class_code = ?;";
+		String sql = "SELECT course_code FROM test.course WHERE course_code = ?;";
 
 		
 		
@@ -464,7 +486,7 @@ public class Teacher_UI{
 	             ResultSet rs = ps.executeQuery();
 
 	             if (rs.next()) { 	    
-	            	 String classCode = rs.getString("class_code");
+	            	 String classCode = rs.getString("course_code");
                      if(!classCode.equals(codetoCheck)) 
                     	 return false; // if codetoCheck is unique
                  }else {

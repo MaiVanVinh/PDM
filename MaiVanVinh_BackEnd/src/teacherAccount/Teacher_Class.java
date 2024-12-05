@@ -12,6 +12,7 @@ import uploadQaA.MainAnswer;
 import uploadQaA.MainQuestion;
 import uploadQaA.UploadToDatabase;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLayeredPane;
@@ -33,6 +34,7 @@ import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
 
 public class Teacher_Class extends JFrame {
 
@@ -57,6 +59,7 @@ public class Teacher_Class extends JFrame {
 	private int numOfJLayeredPane = 0;
 	private int currentPage = 0;
 	private JButton saveAndBack;
+	private String selectedDuration;
 	
 	private ArrayList<String> QaAList;
 	private ArrayList<String> isCorrectList;
@@ -120,25 +123,25 @@ public class Teacher_Class extends JFrame {
 		subLayer = new JLayeredPane();
 		subLayer.setBackground(Color.DARK_GRAY);
 		subLayer.setOpaque(true);
-		subLayer.setBounds(183, 11, 294, 107);
+		subLayer.setBounds(119, 0, 451, 125);
 		subLayer.setVisible(false);
 		contentPane.add(subLayer);
 		
 
-		label = new JLabel("Quiz Name");
+		label = new JLabel("Exam Name");
 		label.setForeground(Color.WHITE);
-		label.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		label.setBounds(75, 0, 200, 49);
+		label.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		label.setBounds(162, -6, 200, 49);
 		subLayer.add(label);
 		
 		/*****************************************/
 		textField = new JTextField();
-		textField.setBounds(24, 54, 149, 27);
+		textField.setBounds(51, 54, 149, 27);
 		subLayer.add(textField);
 		/*****************************************/
 		
 		
-		JButton quizCreation = new JButton("Create Quiz");
+		JButton quizCreation = new JButton("Create Exam");
 		quizCreation.setBounds(580, 11, 104, 48);
 		quizCreation.setFocusable(false);
 		quizCreation.addActionListener(new ActionListener() {
@@ -146,19 +149,9 @@ public class Teacher_Class extends JFrame {
 				subLayer.setVisible(true);
 			}
 		});
-		
-		summitName = new JButton("Summit");
-		summitName.setFocusable(false);
-		summitName.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				  checkDuplicatedQuiz(textField.getText());
-			}});
-		
-		summitName.setBounds(183, 54, 89, 27);
-		subLayer.add(summitName);
 		contentPane.add(quizCreation);
-
-		JButton listQuiz = new JButton("Quiz List");
+		
+		JButton listQuiz = new JButton("Exam List");
 		listQuiz.setBounds(580, 70, 104, 48);
 		listQuiz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -170,6 +163,33 @@ public class Teacher_Class extends JFrame {
 
 		listQuiz.setFocusable(false);
 		contentPane.add(listQuiz);
+		
+		
+		JComboBox<String> duration = new JComboBox<>();
+		duration.setBounds(248, 54, 149, 27);
+		duration.setModel(new DefaultComboBoxModel<String>(new String[] {"Duration", "15 minutes", "30 minutes","45 minutes","60 minutes","90 minutes","120 minutes"}));
+		subLayer.add(duration);
+		
+		
+		summitName = new JButton("Summit");
+		summitName.setFocusable(false);
+		summitName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				  selectedDuration = (String)duration.getSelectedItem();
+			      if( selectedDuration.equals("Duration") ) 
+			    	  JOptionPane.showMessageDialog(null, "Select the duration", "Warning!", JOptionPane.WARNING_MESSAGE);
+			      else {
+				      checkDuplicatedExam(textField.getText());
+				      duration.setVisible(false);
+				      quizCreation.setVisible(false);
+				      listQuiz.setVisible(false);
+			      }
+			}});
+		
+		summitName.setBounds(162, 95, 129, 27);
+		subLayer.add(summitName);
+
+
 		
 		generalLayerPane = new JLayeredPane();
 		generalLayerPane.setBackground(Color.DARK_GRAY);
@@ -186,9 +206,9 @@ public class Teacher_Class extends JFrame {
 				if(checkTitleEmpty)
 					System.out.println("Empty Title");
 				else
-				    clear();			 
+				    clear(duration,quizCreation,listQuiz);			 
 			}});
-		saveAndBack.setBounds(0, 105, 150, 23);
+		saveAndBack.setBounds(0, 70, 118, 58);
 		saveAndBack.setFocusable(false);
 		saveAndBack.setVisible(false);
 		contentPane.add(saveAndBack);
@@ -258,7 +278,7 @@ public class Teacher_Class extends JFrame {
 
 	}
 	
-	private void checkDuplicatedQuiz(String quizName) {
+	private void checkDuplicatedExam(String quizName) {
 		try {
 			if(!CheckDuplicatedQuiz.checkDuplicated(classCode, quizName)) {
 			   if(!textField.getText().isEmpty()) {
@@ -272,7 +292,7 @@ public class Teacher_Class extends JFrame {
 			        addQuestion();		     
 			    }  
 			}else
-				JOptionPane.showMessageDialog(null, "Your quiz name is already existed", "Warning!", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Your exam name is already existed", "Warning!", JOptionPane.WARNING_MESSAGE);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -280,7 +300,7 @@ public class Teacher_Class extends JFrame {
 	
 
 	
-	private void clear() {
+	private void clear(JComboBox<String> duration,JButton quizCreation,JButton listQuiz) {
 
 		quiz.addQuiz(label.getText());
 
@@ -293,7 +313,7 @@ public class Teacher_Class extends JFrame {
 		currentPage = 0;
 		numOfQuestion = 1;
 		
-		label.setText("Quiz Name");
+		label.setText("Exam Name");
 		numOfJLayeredPane = 0;
 		generalLayerPane.removeAll();
     	generalLayerPane.revalidate();        
@@ -310,6 +330,9 @@ public class Teacher_Class extends JFrame {
 		summitName.setVisible(true);
 		saveAndBack.setVisible(false);
 		generalLayerPane.setVisible(false);
+	    duration.setVisible(true);
+	    quizCreation.setVisible(true);
+	    listQuiz.setVisible(true);
 		
 	}
 	
@@ -663,7 +686,7 @@ public class Teacher_Class extends JFrame {
 //            quiz.addMasterList(masterList);
             
             try {
-				uploadToDatabase.pushData(classCode,questionName,que);
+				uploadToDatabase.pushData(classCode,questionName,que,selectedDuration);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
@@ -686,6 +709,4 @@ public class Teacher_Class extends JFrame {
 		}
     	
     }
-
-
 }

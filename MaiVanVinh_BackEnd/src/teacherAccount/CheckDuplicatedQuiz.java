@@ -10,9 +10,9 @@ import connectionSQL.MyConnection;
 
 public class CheckDuplicatedQuiz {
 	
-	public static boolean checkDuplicated(String classCode, String quizName) throws ClassNotFoundException {
+	public static boolean checkDuplicated(String courseCode, String quizName) throws ClassNotFoundException {
 	    Class.forName("com.mysql.cj.jdbc.Driver"); 
-        String sql = "Select title from test.quiz where class_code ='"+classCode+"'";
+        String sql = "Select title from test.exam where course_code ='"+courseCode+"'";
         ArrayList<String> tempList = new ArrayList<>();
         
         boolean checkDuplicate = false;

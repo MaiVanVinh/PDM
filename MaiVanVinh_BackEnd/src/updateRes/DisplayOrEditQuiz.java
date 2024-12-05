@@ -15,6 +15,7 @@ import uploadQaA.MainQuestion;
 import uploadQaA.MainQuiz;
 import uploadQaA.UploadToDatabase;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLayeredPane;
@@ -35,6 +36,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
+import javax.swing.JComboBox;
 
 
 public class DisplayOrEditQuiz extends JFrame {
@@ -80,6 +82,11 @@ public class DisplayOrEditQuiz extends JFrame {
     private boolean checkAddNewQuestion;
     private ArrayList<Integer> addNewQuestionListIndex;
     private JLabel quizName_1;
+    
+    
+    private JComboBox<String> duration;
+    private String setExamDuration;
+    private JButton durationButton; 
 
 
 	public DisplayOrEditQuiz(Teacher_Class teacherClass,String quizName) {
@@ -126,25 +133,22 @@ public class DisplayOrEditQuiz extends JFrame {
 		contentPane.add(subLayer);
 		
 		saveChange = new JButton("Save Change");
-		saveChange.setBounds(294, 92, 104, 23);
+		saveChange.setBounds(10, 92, 104, 23);
 		subLayer.add(saveChange);
-		
 
-		
-
-		
 		saveChange.setVisible(false);
 		saveChange.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(durationButton.isVisible())
+					durationButton.doClick();
                 if(checkEmptyQuestion)
                 	JOptionPane.showMessageDialog(null, "Your question is empty !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
                 else if(checkAddNewQuestion){
-                	if(!checkTitleEmpty) {
-                	  checkAddNewQuestion = false;
-                	  saveChange.setVisible(false);
-				      updateAddNew();
-                	}
+                	   if(!checkTitleEmpty) {
+                	    checkAddNewQuestion = false;
+                	    saveChange.setVisible(false);
+				        updateAddNew();
+                	   }
                 }else {
                 	saveChange.setVisible(false);
                 	updateQuiz(false);
@@ -282,6 +286,7 @@ public class DisplayOrEditQuiz extends JFrame {
 		for(MainQuiz q : masterList) {
 			if(quizName.equals(q.getName())) {
 				quizID = q.getID();
+				setExamDuration = q.getDuration();
 				for(MainQuestion question : q.getQuestions()) {
                     if(q.getQuestions().size() > 1)
                     	previous.setVisible(true);
@@ -294,10 +299,52 @@ public class DisplayOrEditQuiz extends JFrame {
 		
 		quizName_1 = new JLabel(quizName);
 		quizName_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		quizName_1.setBounds(294, 21, 149, 39);
+		quizName_1.setBounds(292, 0, 149, 39);
 		subLayer.add(quizName_1);
 		
+		duration = new JComboBox<>();
+		duration.setBounds(292, 59, 104, 22);
+		duration.setModel(new DefaultComboBoxModel<String>(new String[] {"15 minutes", "30 minutes","45 minutes","60 minutes","90 minutes","120 minutes"}));
+		duration.setSelectedItem(setExamDuration);
+		subLayer.add(duration);
+		
+		durationButton = new JButton("Save Duration");
+		durationButton.setBounds(292, 92, 104, 23);
+		durationButton.setVisible(false); 
+		subLayer.add(durationButton);
+		
+		comboBoxListener(duration,durationButton);
 
+	}
+	
+	private void comboBoxListener(JComboBox<String> duration,JButton button) {
+		
+		duration.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+             
+                if (!duration.getSelectedItem().equals(setExamDuration)) {
+                    button.setVisible(true); 
+                } else {
+                    button.setVisible(false); 
+                }
+            }
+        });
+		
+		button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	setExamDuration = (String) duration.getSelectedItem();
+                button.setVisible(false); 
+                try {
+					UpdateQuiz.updateDuration(quizID, setExamDuration);
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                
+            }
+        });
 	}
 	
 	
@@ -854,7 +901,7 @@ public class DisplayOrEditQuiz extends JFrame {
 	   
 	       try {
 		      try {
-			    u.updateData();
+			    u.updateData(questionName);
 		      }catch (SQLException e) {
 			    e.printStackTrace();
 		      }

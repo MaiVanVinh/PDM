@@ -23,6 +23,7 @@ import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.event.ActionListener;
@@ -76,7 +77,9 @@ public class DoTheQuizPane extends JFrame {
     private JLabel totalQuestion;
     private JButton summit;
     
-
+    private int duration;
+    private final int[] elapsedTime = {0};
+    private JLabel countDown;
 
 	public DoTheQuizPane(boolean isDone,String classCode, String quizName) {
 
@@ -152,6 +155,10 @@ public class DoTheQuizPane extends JFrame {
 		contentPane.add(previous);
 		contentPane.add(nextQuestion);
 		
+		countDown = new JLabel();
+		countDown.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		countDown.setBounds(145, 72, 230, 40);
+		subLayer.add(countDown);
         
         loadQuiz = new LoadQuiz(classCode);
         try {
@@ -164,15 +171,37 @@ public class DoTheQuizPane extends JFrame {
 
 
         loadQuiz();
-        System.out.println(QUIZ_ID);
+//        System.out.println(QUIZ_ID);
+        
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                elapsedTime[0]++; 
+                if(elapsedTime[0] >= 60) {
+                	elapsedTime[0] = 0;
+                	duration--;
+                }
+                if(duration <= 0)
+                	summit.doClick();
+                int timeLeft = (duration);
+                countDown.setText("Time Left: "+timeLeft+" minutes");
+                System.out.println(elapsedTime[0]);
+            }
+        });
+        timer.start();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE); 
         addWindowListener(new WindowAdapter() {
         	@Override
             public void windowClosing(WindowEvent e) {
         		Student_UI.Studentframe.getGlassPane().setVisible(false);
+        		timer.stop();
                 dispose(); 
             }
         });
+        
+         
+
+        
         setVisible(true);
 
 	}
@@ -180,11 +209,14 @@ public class DoTheQuizPane extends JFrame {
 	
 	private void loadQuiz() {
 		int total = 0;
+		int totalQ = 0;
+		String d ="";
 		for(MainQuiz q : masterList) {
 			if(quizName.equals(q.getName())) {
 				QUIZ_ID = q.getID();
+				d = q.getDuration();
 				for(MainQuestion question : q.getQuestions()) {
-					
+					totalQ = q.getQuestions().size();
 					for(MainAnswer a : question.getAns()) {
 						if(a.isCorrect().equals("TRUE")) {
 							correctAnswer.add(a.getOption());
@@ -204,14 +236,18 @@ public class DoTheQuizPane extends JFrame {
 			}
 		}
 		
+		String[] parts = d.split(" ");
+        duration = Integer.parseInt(parts[0]);
+        countDown.setText("Time Left: "+duration+" minutes");
+        
 		scorePerQuestion = 100.0/total;
-		quizName_1 = new JLabel("Quiz Name: "+quizName);
+		quizName_1 = new JLabel("Exam Name: "+quizName);
 		quizName_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		quizName_1.setBounds(285, 21, 300, 39);
+		quizName_1.setBounds(145, 0, 300, 39);
 		
-		totalQuestion = new JLabel("Total Questions: "+total);
+		totalQuestion = new JLabel("Total Questions: "+totalQ);
 		totalQuestion.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		totalQuestion.setBounds(285, 50, 300, 39);
+		totalQuestion.setBounds(145, 35, 300, 39);
 		
 		subLayer.add(quizName_1);
 		subLayer.add(totalQuestion);
@@ -223,10 +259,12 @@ public class DoTheQuizPane extends JFrame {
 			}
 		});
 		summit.setFocusable(false);
-		summit.setBounds(10, 11, 89, 23);
+		summit.setBounds(0, 0, 89, 23);
 		if(isDone)
 			summit.setVisible(false);
 		subLayer.add(summit);
+		
+
 		
 
 	}
@@ -424,8 +462,5 @@ public class DoTheQuizPane extends JFrame {
 			e.printStackTrace();
 		}
     }
-    
-
- 
 }
 

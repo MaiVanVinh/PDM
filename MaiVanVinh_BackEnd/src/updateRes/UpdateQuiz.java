@@ -32,9 +32,10 @@ public class UpdateQuiz {
 		deleteList = new ArrayList<>();
 	}
 	
-	public void updateData() throws ClassNotFoundException, SQLException {
+	public void updateData(String questionName) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		
+		String sqlQuestion = "UPDATE test.question SET question_text = '" + questionName + "' WHERE question_id = " + questionID;
+
 		StringBuilder sqlInsert = new StringBuilder();
 		sqlInsert.append("Insert into Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
 		boolean check = false;
@@ -95,6 +96,9 @@ public class UpdateQuiz {
       	       }
              }
              
+             try(PreparedStatement ps = conn.prepareStatement(sqlQuestion)) {
+          	     ps.executeUpdate(); 
+             }
              conn.close();
         }
 	}
@@ -218,7 +222,7 @@ public class UpdateQuiz {
 	
 	public ArrayList<Integer> getQuestionID(int quizID) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String sql = "Select question_id from test.question where quiz_id =" + quizID;
+		String sql = "Select question_id from test.question where exam_id =" + quizID;
 		
 
 		try (Connection conn = MyConnection.getConnection();
@@ -234,6 +238,21 @@ public class UpdateQuiz {
 	    }
 
 		return questionIDList;
+	}
+	
+	public static void updateDuration(int examID,String duration) throws ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver"); 
+		String sql = "UPDATE test.exam SET duration = '" + duration + "' WHERE exam_id = " + examID;
+		
+
+		try (Connection conn = MyConnection.getConnection();
+		        PreparedStatement stmt = conn.prepareStatement(sql)) {
+			    stmt.executeUpdate();
+			    stmt.close();
+	    } catch (SQLException e) {
+	            e.printStackTrace();
+	    }
+
 	}
 	
 	public void clear() {
