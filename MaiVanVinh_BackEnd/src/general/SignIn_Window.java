@@ -182,7 +182,9 @@ public class SignIn_Window extends JFrame {
 				      loadClassToTeacherAccount();
 				  
 				  JOptionPane.showMessageDialog(null, "Login successfully !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
-			  }
+			  }else
+				  System.out.println("Invalid account");
+			 
 		} catch (HeadlessException | ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -209,10 +211,10 @@ public class SignIn_Window extends JFrame {
 	private boolean checkExistedAccount(String nameToCheck,char[] pass, String selection) throws ClassNotFoundException {
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
 		    String password = new String(pass);
-	        String sql_student = "SELECT id_student, pass_word FROM test.user_student WHERE username = ?;";
-	        String sql_teacher = "SELECT id_teacher, pass_word FROM test.user_teacher WHERE username = ?;";
+	        String sql_student = "SELECT user_ID, pass_word FROM test.accounts WHERE role = 'Student' and user_Name = ?;";
+	        String sql_teacher = "SELECT user_ID, pass_word FROM test.accounts WHERE role = 'Teacher' and user_Name = ?;";
 	        String sql = null;
-	        String studentID = "";
+
 	        id  = null;
 	        
 	        
@@ -229,28 +231,21 @@ public class SignIn_Window extends JFrame {
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	             ps.setString(1, nameToCheck);
-	            
 	             ResultSet rs = ps.executeQuery();
 
 	             if (rs.next()) { 	    
-	            	 String storedPassword = rs.getString("pass_word");
-	            	 
-	     	        if(selection.equals("Student"))
-	     	        	 studentID = rs.getString("id_student");
-	    	        else
-	    	        	 id = rs.getString("id_teacher");
-	            	
-	     	        
+	            	String storedPassword = rs.getString("pass_word");
+
                     if(storedPassword.equals(password)) { 
                     	 checkAuth = true;
-                    	 Teacher_UI.teacherID = id;
-                    	 Student_UI.STUDENT_ID = studentID;
+                    	 id = rs.getString("user_ID");
+                    	 getTeacherOrStudentID(id,selection); 
                     }
                  }
 	             
 	             if(!checkAuth) 
 	            	 JOptionPane.showMessageDialog(null, "Wrong username or password", "Warning!", JOptionPane.WARNING_MESSAGE);
-	             
+
 			     ps.close();
 			     conn.close();
 			     
@@ -260,6 +255,40 @@ public class SignIn_Window extends JFrame {
 	        }
       
 	  return checkAuth;
+	}
+	
+	private void getTeacherOrStudentID(String userID,String role) throws ClassNotFoundException {
+		    Class.forName("com.mysql.cj.jdbc.Driver"); 
+	        String sql_student = "SELECT id_student FROM test.Student WHERE user_id = ?;";
+	        String sql_teacher = "SELECT id_teacher FROM test.Teacher WHERE user_id = ?;";
+	        String sql = null;
+
+	        if(role.equals("Student"))
+	        	sql = sql_student;
+	        else if(role.equals("Teacher"))
+	        	sql = sql_teacher;
+	        else 
+	        	JOptionPane.showMessageDialog(null, "Your selection is empty", "Warning!", JOptionPane.WARNING_MESSAGE);
+
+	        try (Connection conn = MyConnection.getConnection();
+	             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	             ps.setString(1, userID);
+	             ResultSet rs = ps.executeQuery();
+
+	             if (rs.next()) { 	    
+		     	     if(role.equals("Student"))
+		     	        Student_UI.STUDENT_ID= rs.getString("id_student");
+		    	     else
+		    	        Teacher_UI.teacherID = rs.getString("id_teacher");
+                 }
+
+
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+   
+
 	}
 	
 	

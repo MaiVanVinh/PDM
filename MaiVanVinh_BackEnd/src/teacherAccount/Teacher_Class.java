@@ -426,16 +426,16 @@ public class Teacher_Class extends JFrame {
 
 	    JTextField textField_2 = createTextField(check);
 	    
-	    JButton selectionButton = new JButton("Wrong");
+	    JButton selectionButton = new JButton("FALSE");
 	    selectionButton.setFocusable(false);
 	    selectionButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
 	    selectionButton.setBounds(382, originalYSelectionButton, 101, 26);
 	    selectionButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-             if(selectionButton.getText().equals("Correct"))
-                selectionButton.setText("Wrong");
+             if(selectionButton.getText().equals("TRUE"))
+                selectionButton.setText("FASLE");
              else
-                selectionButton.setText("Correct");
+                selectionButton.setText("TRUE");
         }});
         
 	    
@@ -467,17 +467,17 @@ public class Teacher_Class extends JFrame {
 	                newDeleteCheck.setBounds(40, originalYDeleteCheck, 20, 26);
 	                
 	
-	                JButton newSelectionButton = new JButton("Wrong");
+	                JButton newSelectionButton = new JButton("FALSE");
 	                newSelectionButton.setFocusable(false);
 	                newSelectionButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
 	                newSelectionButton.setBounds(382, originalYSelectionButton, 101, 26);
 	                
 	                newSelectionButton.addActionListener(new ActionListener() {
 	                    public void actionPerformed(ActionEvent e) {
-	                        if(newSelectionButton.getText().equals("Correct"))
-	                            newSelectionButton.setText("Wrong");
+	                        if(newSelectionButton.getText().equals("TRUE"))
+	                            newSelectionButton.setText("FALSE");
 	                        else
-	                            newSelectionButton.setText("Correct");
+	                            newSelectionButton.setText("TRUE");
 	                    }
 	                });
 	                
@@ -641,7 +641,7 @@ public class Teacher_Class extends JFrame {
 				   isCorrectList.add("Title");
                
 
-			   if(text.getText().equals("Correct") || text.getText().equals("Wrong")) 
+			   if(text.getText().equals("TRUE") || text.getText().equals("FALSE")) 
 				   isCorrectList.add(text.getText());
    	          
 		}

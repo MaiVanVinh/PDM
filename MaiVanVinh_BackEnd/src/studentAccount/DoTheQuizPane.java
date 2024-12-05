@@ -186,7 +186,7 @@ public class DoTheQuizPane extends JFrame {
 				for(MainQuestion question : q.getQuestions()) {
 					
 					for(MainAnswer a : question.getAns()) {
-						if(a.isCorrect().equals("Correct")) {
+						if(a.isCorrect().equals("TRUE")) {
 							correctAnswer.add(a.getOption());
 						    total++;
 						}
@@ -341,7 +341,7 @@ public class DoTheQuizPane extends JFrame {
 	    textField.setEditable(false);
 	    textField.setFocusable(false);
 	    
-	    if(isCorrect.equals("Correct") && isDone) {
+	    if(isCorrect.equals("TRUE") && isDone) {
 	       JButton correctButton = new JButton(isCorrect);
 	       correctButton.setFocusable(false);
 	       correctButton.setFont(new Font("Tahoma", Font.PLAIN, 10));

@@ -385,7 +385,7 @@ public class DisplayOrEditQuiz extends JFrame {
 			if(i < 4 - offSet)
 			   loadAnswer(quizPane,ans.get(i).getOption(),ans.get(i).isCorrect());
 			else
-			   loadAnswer(quizPane,"","Wrong");
+			   loadAnswer(quizPane,"","FASLE");
 		}
 
 
@@ -476,7 +476,7 @@ public class DisplayOrEditQuiz extends JFrame {
 				numOfAnswer++;
 				if(numOfAnsPane.get(numOfJLayeredPane) < 4) {
 				   numOfAnsPane.set(numOfJLayeredPane, numOfAnswer);
-				   loadAnswer(quizPane,"","Wrong");
+				   loadAnswer(quizPane,"","FALSE");
 				}
 				if(numOfAnsPane.get(numOfJLayeredPane) > 3)
 					addAnswer.setVisible(false);
@@ -570,10 +570,10 @@ public class DisplayOrEditQuiz extends JFrame {
 	    selectionButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
         	 saveChange.setVisible(true);
-             if(selectionButton.getText().equals("Correct"))
-                selectionButton.setText("Wrong");
+             if(selectionButton.getText().equals("TRUE"))
+                selectionButton.setText("FALSE");
              else
-                selectionButton.setText("Correct");
+                selectionButton.setText("TRUE");
         }});
         
 	    
@@ -617,10 +617,10 @@ public class DisplayOrEditQuiz extends JFrame {
 	                newSelectionButton.addActionListener(new ActionListener() {
 	                    public void actionPerformed(ActionEvent e) {
 	                    	saveChange.setVisible(true);
-	                        if(newSelectionButton.getText().equals("Correct"))
-	                            newSelectionButton.setText("Wrong");
+	                        if(newSelectionButton.getText().equals("TRUE"))
+	                            newSelectionButton.setText("FALSE");
 	                        else
-	                            newSelectionButton.setText("Correct");
+	                            newSelectionButton.setText("TRUE");
 	                    }
 	                });
 	                
@@ -836,7 +836,7 @@ public class DisplayOrEditQuiz extends JFrame {
 				   isCorrectList.add("Title");
             
 
-			   if(text.getText().equals("Correct") || text.getText().equals("Wrong")) 
+			   if(text.getText().equals("TRUE") || text.getText().equals("FALSE")) 
 				   isCorrectList.add(text.getText());
 		}
     	

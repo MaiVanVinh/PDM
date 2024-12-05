@@ -127,10 +127,16 @@ public class LoadQuiz {
 	private void answer(int ID, Connection conn) throws SQLException {
 		String answerQuery = "SELECT answer_id, answer_text,is_correct FROM test.answer WHERE question_id = "+ID;
 		ans.clear();
+		String isCorrect = "";
+		
 		PreparedStatement st = conn.prepareStatement(answerQuery); 
 		ResultSet rs = st.executeQuery();
 		while(rs.next()) {
-			ans.add(new MainAnswer(rs.getInt("answer_id"),rs.getString("answer_text"),rs.getString("is_correct")));
+			if(rs.getBoolean("is_correct"))
+				isCorrect = "TRUE";
+			else
+				isCorrect = "FALSE";
+			ans.add(new MainAnswer(rs.getInt("answer_id"),rs.getString("answer_text"),isCorrect));
 		}answers.add(new ArrayList<>(ans));
 
 	}

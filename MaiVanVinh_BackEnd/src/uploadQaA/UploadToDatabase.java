@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 
 import connectionSQL.MyConnection;
 import studentAccount.DoTheQuizPane;
-import studentAccount.ShowStudentQuiz;
 import studentAccount.Student_UI;
 
 import java.sql.Statement;
@@ -23,7 +22,7 @@ public class UploadToDatabase {
 		String insertQuiz = "INSERT INTO Quiz (title,class_code) VALUES (?,?);";
 		String sqlQue = ("INSERT INTO Question (quiz_id, question_text) VALUES (?,?);");
 		String sqlAns = ("INSERT INTO Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
-		
+		boolean isCorrect = false;
 		
 
 		
@@ -51,9 +50,14 @@ public class UploadToDatabase {
 	    	 for(MainAnswer a : q.getAns()) {
 
 	                PreparedStatement answerStmt = MyConnection.getConnection().prepareStatement(sqlAns);
+	                if(a.isCorrect().equals("TRUE"))
+	                	isCorrect = true;
+	                else 
+	                	isCorrect = false;
+	                
 	                answerStmt.setInt(1, questionId);
 	                answerStmt.setString(2, a.getOption());
-	                answerStmt.setString(3, a.isCorrect());
+	                answerStmt.setBoolean(3, isCorrect);
 	                answerStmt.executeUpdate();
 	    		 
 	    	 }
@@ -98,19 +102,18 @@ public class UploadToDatabase {
 	
 	public static void uploadStudentQuizScore(int score,String quizName) throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "Insert into student_quiz(student_id,class_id,quiz_id,grade,quiz_name) Values (?,?,?,?,?)";
+		String sql = "Insert into student_quiz(student_id,quiz_id,grade,quiz_name) Values (?,?,?,?)";
 		String studentID = Student_UI.STUDENT_ID;
-		int classID = ShowStudentQuiz.CLASS_ID;
+//		int classID = ShowStudentQuiz.CLASS_ID;
 		int quizID = DoTheQuizPane.QUIZ_ID;
 		
 		 Connection connection = MyConnection.getConnection();
 		 PreparedStatement ps = connection.prepareStatement(sql);
 
 		 ps.setString(1, studentID);
-		 ps.setInt(2, classID);
-		 ps.setInt(3, quizID);
-		 ps.setInt(4, score);
-		 ps.setString(5, quizName);
+		 ps.setInt(2, quizID);
+		 ps.setInt(3, score);
+		 ps.setString(4, quizName);
 		 
 		 ps.executeUpdate(); 
 		 JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);

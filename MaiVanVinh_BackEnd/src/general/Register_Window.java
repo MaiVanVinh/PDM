@@ -27,6 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 
@@ -198,7 +199,7 @@ public class Register_Window extends JFrame {
 		
 			if(checkLength && checkComboBox && checkUsername) {
 				try {
-					passInfo_toDatabase(usernameField.getText(),passwordField.getPassword(),(String) comboBox.getSelectedItem(),lastName,firstName,phoneNum);
+					createUserAccount(usernameField.getText(),passwordField.getPassword(),(String) comboBox.getSelectedItem(),lastName,firstName,phoneNum);
 					usernameField.setText("");
 					passwordField.setText("");
 					lastNameInput.setText("");
@@ -214,10 +215,10 @@ public class Register_Window extends JFrame {
 	
 
 	
-	private void passInfo_toDatabase(String name, char[] pass, String selection,String firstName,String lastName,String phoneNum) throws SQLException {
-		
+	private void createUserAccount(String name, char[] pass, String role,String firstName,String lastName,String phoneNum) throws SQLException {
 
 		String password = new String(pass);
+		int ID = 0;
 	
 		try {
 			
@@ -225,17 +226,19 @@ public class Register_Window extends JFrame {
 			     Connection connection = MyConnection.getConnection();
 			     
 			     StringBuilder query = new StringBuilder();
-			     query.append("INSERT INTO user_"+selection.toLowerCase()+" (username, pass_word,firstName,lastName,phoneNumber) VALUES (?,?,?,?,?)");
+			     query.append("INSERT INTO accounts (user_Name, pass_word,role) VALUES (?,?,?)");
 			     
-			     PreparedStatement ps = connection.prepareStatement(query.toString());
-			
+			     PreparedStatement ps = connection.prepareStatement(query.toString(),Statement.RETURN_GENERATED_KEYS);
 			     ps.setString(1, name);
 			     ps.setString(2, password);
-			     ps.setString(3, firstName);
-			     ps.setString(4, lastName);
-			     ps.setString(5, phoneNum);
-			     
+			     ps.setString(3, role);
 			     ps.executeUpdate(); 
+			     
+			     ResultSet pK = ps.getGeneratedKeys();
+			     if(pK.next()) 
+			         ID = pK.getInt(1);
+			     pushTeacherOrStudentInfomation(ID,role,firstName,lastName,phoneNum);
+			     
 			     JOptionPane.showMessageDialog(null, "Successfully", "Warning!", JOptionPane.WARNING_MESSAGE);
 			     ps.close();
 			     connection.close();
@@ -247,35 +250,43 @@ public class Register_Window extends JFrame {
 		
 	}
 
+	private void pushTeacherOrStudentInfomation(int userID,String role,String firstName,String lastName,String phoneNum) throws SQLException {
+
+		
+		try {
+			
+			     Class.forName("com.mysql.cj.jdbc.Driver");
+			     Connection connection = MyConnection.getConnection();
+			     
+			     StringBuilder query = new StringBuilder();
+			     query.append("INSERT INTO "+role+" (user_id,firstName,lastName,phoneNumber) VALUES (?,?,?,?)");
+			     
+			     PreparedStatement ps = connection.prepareStatement(query.toString());
+			
+			     ps.setInt(1, userID);
+			     ps.setString(2, firstName);
+			     ps.setString(3, lastName);
+			     ps.setString(4, phoneNum);
+			     ps.executeUpdate(); 
+				
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	
 	private boolean checkExistedAccount(String nameToCheck, String selection) throws ClassNotFoundException {
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
-	        String sql_student = "SELECT username FROM test.user_student WHERE username = ? ;";
-	        String sql_teacher = "SELECT username FROM test.user_teacher WHERE username = ? ;";
-	        String sql;
-	        
-	        if(selection.equals("Student"))
-	        	sql = sql_student;
-	        else
-	        	sql = sql_teacher;
-	      
-	        
+	        String sql = "SELECT user_Name FROM test.accounts WHERE user_Name = ? ;";
+
             boolean checkExist = true;
 	        try (Connection conn = MyConnection.getConnection();
 	             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-	             ps.setString(1, nameToCheck);
-	            
+	             ps.setString(1, nameToCheck);           
 	             ResultSet rs = ps.executeQuery();
-
-	             if (rs.next()) {
-	                 System.out.println("The student '" + nameToCheck + "' exists in the database.");
+	             if (rs.next()) 
 	                 checkExist = false;
-	             } else {
-	                 System.out.println("The student '" + nameToCheck + "' does not exist in the database.");
-	             }
-        
+
 			     ps.close();
 			     conn.close();
 			     
