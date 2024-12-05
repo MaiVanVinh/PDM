@@ -3,6 +3,9 @@ package teacherAccount;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import uploadQaA.MainAnswer;
@@ -65,6 +68,8 @@ public class Teacher_Class extends JFrame {
 	
 	private QuizList quiz;
 	public static String classCode;
+	
+	private boolean checkTitleEmpty;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -178,7 +183,10 @@ public class Teacher_Class extends JFrame {
 		saveAndBack = new JButton("Save Everything");
 		saveAndBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				clear();			 
+				if(checkTitleEmpty)
+					System.out.println("Empty Title");
+				else
+				    clear();			 
 			}});
 		saveAndBack.setBounds(0, 105, 150, 23);
 		saveAndBack.setFocusable(false);
@@ -311,7 +319,7 @@ public class Teacher_Class extends JFrame {
 	
 	private void addQuestion() {
 		currentPage++;
-		
+		checkTitleEmpty = true;
 		quiz.setVisible(false);
 		JLayeredPane quizPane = new JLayeredPane();
 		quizPane.setBackground(Color.DARK_GRAY);
@@ -325,6 +333,8 @@ public class Teacher_Class extends JFrame {
 		JTextField titleText = new JTextField("");
 		titleText.setBounds(68, 48, 292, 26);
 		quizPane.add(titleText);
+		checkEmptyTitle(titleText);
+
      	
      	JButton add = new JButton("Add");
      	add.setBounds(575, 11, 89, 23);
@@ -392,6 +402,35 @@ public class Teacher_Class extends JFrame {
 
 	}
 	
+	private void checkEmptyTitle(JTextField t) {
+		 t.getDocument().addDocumentListener(new DocumentListener() {
+		        @Override
+		        public void insertUpdate(DocumentEvent e) {
+		        	checkEmpty();
+		        }
+
+		        @Override
+		        public void removeUpdate(DocumentEvent e) {
+		        	checkEmpty();
+		        }
+
+		        @Override
+		        public void changedUpdate(DocumentEvent e) {
+		        	 checkEmpty();
+		        }
+		        
+		        private void checkEmpty() {
+		        	if(t.getText().isEmpty()) 
+		        		checkTitleEmpty = true;
+		        	else 
+		        		checkTitleEmpty = false;
+
+		        }
+
+		    });
+		}
+	
+	
 	private void chooseQuestion(int i) {
 		
         if (numOfJLayeredPane > 0 && i == 1) {
@@ -433,7 +472,7 @@ public class Teacher_Class extends JFrame {
 	    selectionButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
              if(selectionButton.getText().equals("TRUE"))
-                selectionButton.setText("FASLE");
+                selectionButton.setText("FALSE");
              else
                 selectionButton.setText("TRUE");
         }});

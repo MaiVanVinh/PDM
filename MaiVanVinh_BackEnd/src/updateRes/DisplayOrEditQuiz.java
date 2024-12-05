@@ -50,7 +50,7 @@ public class DisplayOrEditQuiz extends JFrame {
 	private int numOfQuestion = 0;
 	private int numOfAnswer = 0;
 	private int check = 0;
-	
+	private boolean checkTitleEmpty;
  
 	private ArrayList<JLayeredPane> JLayeredPane_List;
 	private ArrayList<Integer> numOfAnsPane;  
@@ -136,15 +136,19 @@ public class DisplayOrEditQuiz extends JFrame {
 		saveChange.setVisible(false);
 		saveChange.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveChange.setVisible(false);
+				
                 if(checkEmptyQuestion)
                 	JOptionPane.showMessageDialog(null, "Your question is empty !!", "Warning!", JOptionPane.WARNING_MESSAGE);		
                 else if(checkAddNewQuestion){
-                	checkAddNewQuestion = false;
+                	if(!checkTitleEmpty) {
+                	  checkAddNewQuestion = false;
+                	  saveChange.setVisible(false);
+				      updateAddNew();
+                	}
+                }else {
                 	saveChange.setVisible(false);
-				    updateAddNew();
-                }else
                 	updateQuiz(false);
+                }
 			}
 		});
 		
@@ -385,7 +389,7 @@ public class DisplayOrEditQuiz extends JFrame {
 			if(i < 4 - offSet)
 			   loadAnswer(quizPane,ans.get(i).getOption(),ans.get(i).isCorrect());
 			else
-			   loadAnswer(quizPane,"","FASLE");
+			   loadAnswer(quizPane,"","FALSE");
 		}
 
 
@@ -401,7 +405,7 @@ public class DisplayOrEditQuiz extends JFrame {
 	private void addQuestion() {
 	
 		currentPage++;
-		
+		checkTitleEmpty = true;
 
 //		quiz.setVisible(false);
 		JLayeredPane quizPane = new JLayeredPane();
@@ -416,6 +420,7 @@ public class DisplayOrEditQuiz extends JFrame {
 		JTextField titleText = new JTextField();
 		titleText.setBounds(68, 48, 292, 26);
 		quizPane.add(titleText);
+		checkEmptyTitle(titleText);
      	
      	JButton add = new JButton("Add");
      	add.setBounds(575, 11, 89, 23);
@@ -506,6 +511,34 @@ public class DisplayOrEditQuiz extends JFrame {
           
         
 	}
+	
+	private void checkEmptyTitle(JTextField t) {
+		 t.getDocument().addDocumentListener(new DocumentListener() {
+		        @Override
+		        public void insertUpdate(DocumentEvent e) {
+		        	checkEmpty();
+		        }
+
+		        @Override
+		        public void removeUpdate(DocumentEvent e) {
+		        	checkEmpty();
+		        }
+
+		        @Override
+		        public void changedUpdate(DocumentEvent e) {
+		        	 checkEmpty();
+		        }
+		        
+		        private void checkEmpty() {
+		        	if(t.getText().isEmpty()) 
+		        		checkTitleEmpty = true;
+		        	else 
+		        		checkTitleEmpty = false;
+
+		        }
+
+		    });
+		}
 	
 	private void showSaveChangeButton(JTextField t,int i) {
 
@@ -769,7 +802,7 @@ public class DisplayOrEditQuiz extends JFrame {
 	
 	private void showQuestion_Answer(int questionID) {
 	    int i = 0;
-	    int index = 0; 
+	    int index = 1; 
 	    String questionName = "";
 	    ArrayList<MainAnswer> ans = new ArrayList<>();   
 
@@ -797,15 +830,19 @@ public class DisplayOrEditQuiz extends JFrame {
            if(i==0)
         	   questionName = list;
            else {
-        	   if(!list.isEmpty() && index < isCorrectList.size()) {
+        	   if(!list.isEmpty() && (index) < isCorrectList.size()) {
         	      AnswerList.add(list);
-        	      ans.add(new MainAnswer(list,isCorrectList.get(index+1)));
+        	      ans.add(new MainAnswer(list,isCorrectList.get(index)));
         	   }index++;
         	   
 
-           }i++;	    
+           }i++;	 
+           System.out.println("TEST:"+list);
 	   }
 
+//	   for(String s : isCorrectList) {
+//		   System.out.println("TEST"+s);
+//	   }
 
        editQuestion.setQuestion(questionID, questionName, new ArrayList<>(ans));
 
@@ -835,8 +872,7 @@ public class DisplayOrEditQuiz extends JFrame {
             if(text.getText().equals("Add Answer")) 
 				   isCorrectList.add("Title");
             
-
-			   if(text.getText().equals("TRUE") || text.getText().equals("FALSE")) 
+            if(text.getText().equals("TRUE") || text.getText().equals("FALSE")) 
 				   isCorrectList.add(text.getText());
 		}
     	

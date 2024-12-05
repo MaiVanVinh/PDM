@@ -37,7 +37,7 @@ public class UpdateQuiz {
 		
 		StringBuilder sqlInsert = new StringBuilder();
 		sqlInsert.append("Insert into Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
-		
+		boolean check = false;
 		MainQuestion q = questions.get(0);
 		
 		getPreviousAnswerIDData();
@@ -64,17 +64,21 @@ public class UpdateQuiz {
         			    ps.executeUpdate();
         			    System.out.println("ok");
         			} catch (SQLException e) {
-        			    e.printStackTrace(); // Log the exception for debugging purposes
+        			    e.printStackTrace(); 
         			}
 
         			for (MainAnswer a : q.getAns()) {
         			    try (PreparedStatement psInsert = conn.prepareStatement(sqlInsert.toString())) {
-        			        psInsert.setInt(1, this.questionID);
+        			        if(a.isCorrect().equals("TRUE"))
+        			        	check = true;
+        			        else
+        			        	check = false;
+        			    	psInsert.setInt(1, this.questionID);
         			        psInsert.setString(2, a.getOption());
-        			        psInsert.setString(3, a.isCorrect()); // Convert boolean to String
+        			        psInsert.setBoolean(3, check); 
         			        psInsert.executeUpdate();
         			    } catch (SQLException e) {
-        			        e.printStackTrace(); // Log exceptions occurring in this block
+        			        e.printStackTrace(); 
         			    }
         			}
 

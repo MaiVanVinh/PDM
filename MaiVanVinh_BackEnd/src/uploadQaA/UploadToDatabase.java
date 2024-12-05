@@ -75,6 +75,7 @@ public class UploadToDatabase {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
 		String sqlQue = ("INSERT INTO Question (quiz_id, question_text) VALUES (?,?);");
 		String sqlAns = ("INSERT INTO Answer (question_id, answer_text, is_correct) VALUES (?,?,?);");
+		boolean isCorrect = false;
 		
 	     for(MainQuestion q : questions) {
 	    	PreparedStatement psQuestion = MyConnection.getConnection().prepareStatement(sqlQue,Statement.RETURN_GENERATED_KEYS);
@@ -87,11 +88,14 @@ public class UploadToDatabase {
            int questionId = questionKeys.getInt(1);
 	    	 
 	    	 for(MainAnswer a : q.getAns()) {
-
+	                if(a.isCorrect().equals("TRUE"))
+	                	isCorrect = true;
+	                else 
+	                	isCorrect = false;
 	                PreparedStatement answerStmt = MyConnection.getConnection().prepareStatement(sqlAns);
 	                answerStmt.setInt(1, questionId);
 	                answerStmt.setString(2, a.getOption());
-	                answerStmt.setString(3, a.isCorrect());
+	                answerStmt.setBoolean(3, isCorrect);
 	                answerStmt.executeUpdate();
 	    		 
 	    	 }
