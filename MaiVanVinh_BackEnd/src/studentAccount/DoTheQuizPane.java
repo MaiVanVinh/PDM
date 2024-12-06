@@ -66,7 +66,9 @@ public class DoTheQuizPane extends JFrame {
 
     public static int QUIZ_ID;
     private String quizName;
+    private String courseCode;
     private boolean isDone;
+    
     
 
     private HashMap<String, List<String>> questionAnswers;
@@ -92,6 +94,7 @@ public class DoTheQuizPane extends JFrame {
 		
 		this.quizName = quizName; 
 		this.isDone = isDone;
+        this.courseCode = classCode;
 		JLayeredPane_List = new ArrayList<>();
 		masterList = new ArrayList<>();
 
@@ -106,7 +109,7 @@ public class DoTheQuizPane extends JFrame {
 		
 
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(700,450);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -189,19 +192,30 @@ public class DoTheQuizPane extends JFrame {
             }
         });
         timer.start();
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE); 
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); 
         addWindowListener(new WindowAdapter() {
         	@Override
             public void windowClosing(WindowEvent e) {
-        		Student_UI.Studentframe.getGlassPane().setVisible(false);
-        		timer.stop();
-                dispose(); 
+        		int response = JOptionPane.showConfirmDialog(
+                        DoTheQuizPane.this, 
+                        "Are you sure you want to exit?", 
+                        "Confirm Exit", 
+                        JOptionPane.YES_NO_OPTION
+                    );
+                    
+                    
+                    if (response == JOptionPane.YES_OPTION) {
+                    	if(summit.isVisible() && !isDone)
+                    		summit.doClick();
+                    	Student_UI.Studentframe.getGlassPane().setVisible(false);
+                		timer.stop();
+                        dispose(); 
+                    }
+        		
             }
         });
         
-         
 
-        
         setVisible(true);
 
 	}
@@ -256,6 +270,7 @@ public class DoTheQuizPane extends JFrame {
 		summit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				printTheResult(); 
+				summit.setVisible(false);
 			}
 		});
 		summit.setFocusable(false);
@@ -457,7 +472,7 @@ public class DoTheQuizPane extends JFrame {
         JOptionPane.showMessageDialog(null, "Your score is "+result, "Announcement!", JOptionPane.INFORMATION_MESSAGE);	
         summit.setVisible(false);
         try {
-			UploadToDatabase.uploadStudentQuizScore(result, quizName);
+			UploadToDatabase.uploadStudentQuizScore(result, quizName,courseCode,0);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}

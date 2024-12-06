@@ -47,6 +47,13 @@ public class Teacher_Class extends JFrame {
 	private JButton previous;
 	private JLabel label; 
 	
+	private JComboBox<String> dayComboBox;
+	private JComboBox<String> monthComboBox;
+	private JComboBox<String> yearComboBox;
+	private String daySelection = "";
+	private String monthSelection = "";
+	private String yearSelection = "";
+	
 	private JLayeredPane subLayer;
 	private JLayeredPane generalLayerPane; 
 	private int numOfQuestion = 1;
@@ -70,7 +77,7 @@ public class Teacher_Class extends JFrame {
 	private ArrayList<String> AnswerList;
 	
 	private QuizList quiz;
-	public static String classCode;
+	public static String CLASSCODE;
 	
 	private boolean checkTitleEmpty;
 
@@ -91,7 +98,7 @@ public class Teacher_Class extends JFrame {
 
 	
 	public Teacher_Class() {
-        System.out.println(classCode);
+        System.out.println(CLASSCODE);
 		
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -131,12 +138,12 @@ public class Teacher_Class extends JFrame {
 		label = new JLabel("Exam Name");
 		label.setForeground(Color.WHITE);
 		label.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		label.setBounds(162, -6, 200, 49);
+		label.setBounds(10, 0, 200, 31);
 		subLayer.add(label);
 		
 		/*****************************************/
 		textField = new JTextField();
-		textField.setBounds(51, 54, 149, 27);
+		textField.setBounds(10, 29, 149, 27);
 		subLayer.add(textField);
 		/*****************************************/
 		
@@ -166,19 +173,38 @@ public class Teacher_Class extends JFrame {
 		
 		
 		JComboBox<String> duration = new JComboBox<>();
-		duration.setBounds(248, 54, 149, 27);
+		duration.setBounds(235, 87, 206, 27);
 		duration.setModel(new DefaultComboBoxModel<String>(new String[] {"Duration", "15 minutes", "30 minutes","45 minutes","60 minutes","90 minutes","120 minutes"}));
 		subLayer.add(duration);
 		
+		monthComboBox = new JComboBox<>();
+		monthComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"","1", "2", "3","4","5","6","7","8","9","10","11","12"}));
+		monthComboBox.setBounds(306, 29, 65, 27);
+		subLayer.add(monthComboBox);
+		
+		dayComboBox = new JComboBox<>();
+		dayComboBox.setBounds(235, 29, 65, 27);
+		dayComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"","1", "2", "3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","19","20","21","22","23","24","25","26","27","28","29","30","31"}));
+		subLayer.add(dayComboBox);
+		
+		yearComboBox = new JComboBox<>();
+		yearComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"","2024", "2025", "2026","2027","2028","2029","2030","2031","2032","2033","2034","2035"}));
+		yearComboBox.setBounds(376, 29, 65, 27);
+		subLayer.add(yearComboBox);
 		
 		summitName = new JButton("Summit");
 		summitName.setFocusable(false);
 		summitName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				  selectedDuration = (String)duration.getSelectedItem();
+				  daySelection = (String) dayComboBox.getSelectedItem();
+				  monthSelection = (String) monthComboBox.getSelectedItem();
+				  yearSelection = (String) yearComboBox.getSelectedItem();
 			      if( selectedDuration.equals("Duration") ) 
 			    	  JOptionPane.showMessageDialog(null, "Select the duration", "Warning!", JOptionPane.WARNING_MESSAGE);
-			      else {
+			      else if(daySelection.equals("")||monthSelection.equals("")||yearSelection.equals("")) {
+			    	  JOptionPane.showMessageDialog(null, "Set the deadline", "Warning!", JOptionPane.WARNING_MESSAGE);
+			      }else {
 				      checkDuplicatedExam(textField.getText());
 				      duration.setVisible(false);
 				      quizCreation.setVisible(false);
@@ -186,8 +212,18 @@ public class Teacher_Class extends JFrame {
 			      }
 			}});
 		
-		summitName.setBounds(162, 95, 129, 27);
+		summitName.setBounds(10, 87, 149, 27);
 		subLayer.add(summitName);
+		
+		
+		
+		
+		
+		JLabel deadLineLabel = new JLabel("Dead Line");
+		deadLineLabel.setForeground(Color.WHITE);
+		deadLineLabel.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		deadLineLabel.setBounds(296, 0, 145, 31);
+		subLayer.add(deadLineLabel);
 
 
 		
@@ -280,7 +316,7 @@ public class Teacher_Class extends JFrame {
 	
 	private void checkDuplicatedExam(String quizName) {
 		try {
-			if(!CheckDuplicatedQuiz.checkDuplicated(classCode, quizName)) {
+			if(!CheckDuplicatedQuiz.checkDuplicated(CLASSCODE, quizName)) {
 			   if(!textField.getText().isEmpty()) {
 				    questionName = textField.getText();
 				    generalLayerPane.setVisible(true);
@@ -686,7 +722,8 @@ public class Teacher_Class extends JFrame {
 //            quiz.addMasterList(masterList);
             
             try {
-				uploadToDatabase.pushData(classCode,questionName,que,selectedDuration);
+				uploadToDatabase.pushData(CLASSCODE,
+						questionName,que,selectedDuration,yearSelection,monthSelection,daySelection);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}

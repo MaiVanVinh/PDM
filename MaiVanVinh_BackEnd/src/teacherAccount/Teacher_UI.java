@@ -14,6 +14,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -62,6 +63,7 @@ public class Teacher_UI{
     private JPanel panel;
     private JButton removeClass;
     private JButton createClass;
+
     
     private ArrayList<JCheckBox> checkBox_Class;
     private ArrayList<JButton> button_Class;
@@ -71,6 +73,7 @@ public class Teacher_UI{
 
     private Teacher_Class teacherQuiz;
     private String semester;
+    private JButton studentList;
 
 	public Teacher_UI(SignIn_Window signin) {
 		
@@ -122,6 +125,7 @@ public class Teacher_UI{
 		contentPane.add(teacher_class);
 		
 		createClass = new JButton("Create course");
+		createClass.setFocusable(false);
 		createClass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createNewClassButton();
@@ -130,7 +134,7 @@ public class Teacher_UI{
 		createClass.setBounds(517, 11, 157, 47);
 		contentPane.add(createClass);
 		
-		
+	
 		textField = new JTextField();
 		textField.setBounds(112, 11, 126, 25);
 		textField.setVisible(false);
@@ -186,9 +190,34 @@ public class Teacher_UI{
 
 		removeClass.setBounds(517, 78, 157, 38);
 		contentPane.add(removeClass);
+		
+		studentList = new JButton("Student List");
+		studentList.setFocusable(false);
+		studentList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayStudentList();
+			}
+		});
+		studentList.setBounds(10, 11, 145, 47);
+		contentPane.add(studentList);
 
 	}
 	
+	private void displayStudentList() {
+	    frame.setGlassPane(new JPanel() {
+	   	private static final long serialVersionUID = -5643729088768657875L;
+	    {
+	     setOpaque(false); 
+	     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); 
+	     addMouseListener(new java.awt.event.MouseAdapter() {}); 
+	     }});
+	    frame.getGlassPane().setVisible(true);
+		StudentTableList studentListFrame = new StudentTableList();
+		studentListFrame.setVisible(true);
+		
+	}
+	
+
 	
 	private void summitAction() {
 
@@ -240,7 +269,7 @@ public class Teacher_UI{
             
             button.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                       Teacher_Class.classCode = uniqueClassCode;
+                       Teacher_Class.CLASSCODE = uniqueClassCode;
                		   teacherQuiz = new Teacher_Class();
                        teacherQuiz.setVisible(true);
                        frame.setVisible(false);
@@ -313,7 +342,7 @@ public class Teacher_UI{
             
             button.addActionListener(new ActionListener() {        
                 public void actionPerformed(ActionEvent e) {  
-                    Teacher_Class.classCode = classCode;
+                    Teacher_Class.CLASSCODE = classCode;
             		teacherQuiz = new Teacher_Class();
                     teacherQuiz.setVisible(true);
                     frame.setVisible(false);

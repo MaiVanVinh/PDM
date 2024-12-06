@@ -11,21 +11,47 @@ import connectionSQL.MyConnection;
 
 
 
+
 public class LoadCreatedClass {
 
 	private ArrayList<String> classInfo;
+	private ArrayList<String> courseNames;
 	private HashMap<String,String> classes = new HashMap<>();
 	private int numberOfComponents;
 	public static String ID;
 	   
 	 public LoadCreatedClass(){
 		 classInfo = new ArrayList<>();
+		 courseNames = new ArrayList<>(); 
 		 classes = new HashMap<>();
 	 }
 	 
-	 
-	 
-	 
+	 public void getCourseName() throws ClassNotFoundException {
+		    Class.forName("com.mysql.cj.jdbc.Driver"); 
+	        String query = "SELECT course_name FROM test.course WHERE teacher_id = 1";
+
+	        try {
+	            
+	            Connection conn = MyConnection.getConnection();
+
+	            PreparedStatement st = conn.prepareStatement(query);
+	            
+	            ResultSet rs = st.executeQuery();
+
+	            while (rs.next()) {
+	            	courseNames.add(rs.getString("course_name"));
+ 
+	            }
+	            
+
+	            rs.close();
+	            st.close();
+	            conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	 }
+ 
 	 public void getCreatedClass() throws ClassNotFoundException {
 
 		    Class.forName("com.mysql.cj.jdbc.Driver"); 
@@ -34,9 +60,7 @@ public class LoadCreatedClass {
 	        try {
 	            
 	            Connection conn = MyConnection.getConnection();
-
-	            PreparedStatement st = conn.prepareStatement(query);
-	            
+	            PreparedStatement st = conn.prepareStatement(query);	            
 	            ResultSet rs = st.executeQuery();
 
 	            while (rs.next()) {
@@ -122,6 +146,11 @@ public class LoadCreatedClass {
 	 public ArrayList<String> getInfoClass() {
 		 return classInfo;
 	 }
+	 
+	 public ArrayList<String> getCourseNames() {
+		 return courseNames;
+	 }
+	 
 	 
 	 public HashMap<String,String> getHashMap(){
 		 return classes;

@@ -38,7 +38,7 @@ public class QuizList extends JPanel {
     private JPanel panel;
     private int iJSrollPane = 0;
     private JButton removeQuiz;
-    private LoadQuiz l = new LoadQuiz(Teacher_Class.classCode);
+    private LoadQuiz l = new LoadQuiz(Teacher_Class.CLASSCODE);
     private ArrayList<MainQuiz> masterList;
     private ArrayList<String> quizList;
     
@@ -78,7 +78,7 @@ public class QuizList extends JPanel {
 		removeQuiz = new JButton("Delete Exam");
 		removeQuiz.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-               d.getReady(deleteList, Teacher_Class.classCode);   
+               d.getReady(deleteList, Teacher_Class.CLASSCODE);   
                try {
 				d.deleteSQL();
 			} catch (ClassNotFoundException e1) {

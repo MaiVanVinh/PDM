@@ -1,10 +1,12 @@
 package updateRes;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import connectionSQL.MyConnection;
 import uploadQaA.MainAnswer;
@@ -30,6 +32,26 @@ public class UpdateQuiz {
 		previousAnswerID = new ArrayList<>();
 		questionIDList = new ArrayList<>();
 		deleteList = new ArrayList<>();
+	}
+	
+	public void updateDeadLine(int examID,int year,int month,int day) throws ClassNotFoundException, SQLException {
+		Class.forName("com.mysql.cj.jdbc.Driver"); 
+		Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, day); 
+        Date eventDate = new Date(calendar.getTimeInMillis());
+        
+        String sql = "UPDATE test.exam\r\n"
+        		+ "SET deadline = ?\r\n"
+        		+ "WHERE exam_id = "+examID+";";
+        
+        try (Connection conn = MyConnection.getConnection()) {	                  	     
+       	   try(PreparedStatement ps = conn.prepareStatement(sql)) {
+       		  ps.setDate(1, eventDate);
+       	      ps.executeUpdate(); 
+       	      System.out.println("ok");
+	       }conn.close();  
+        }
+       
 	}
 	
 	public void updateData(String questionName) throws ClassNotFoundException, SQLException {

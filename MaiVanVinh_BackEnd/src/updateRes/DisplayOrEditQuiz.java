@@ -71,7 +71,7 @@ public class DisplayOrEditQuiz extends JFrame {
     private String quizName;
     private int quizID;
     
-    private LoadQuiz l = new LoadQuiz(Teacher_Class.classCode);
+    private LoadQuiz l = new LoadQuiz(Teacher_Class.CLASSCODE);
     private JButton saveChange;
 
     private MainQuestion editQuestion;
@@ -87,6 +87,11 @@ public class DisplayOrEditQuiz extends JFrame {
     private JComboBox<String> duration;
     private String setExamDuration;
     private JButton durationButton; 
+    private JComboBox<Integer> dayComboBox;
+    private JComboBox<Integer> monthComboBox;
+    private JComboBox<Integer> yearComboBox;
+    private JLabel quizName_2;
+    private JButton saveDeadLine;
 
 
 	public DisplayOrEditQuiz(Teacher_Class teacherClass,String quizName) {
@@ -165,6 +170,41 @@ public class DisplayOrEditQuiz extends JFrame {
 		generalLayerPane.setLayout(null);
 		contentPane.add(generalLayerPane);
 		
+		dayComboBox = new JComboBox<>();
+		dayComboBox.setBounds(472, 59, 49, 22);
+		subLayer.add(dayComboBox);
+		
+		monthComboBox = new JComboBox<>();
+		monthComboBox.setBounds(535, 59, 49, 22);
+		subLayer.add(monthComboBox);
+		
+		yearComboBox = new JComboBox<>();		
+		yearComboBox.setBounds(594, 59, 69, 22);
+		subLayer.add(yearComboBox);
+		
+		monthComboBox.setModel(new DefaultComboBoxModel<>(new Integer[] {
+			     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+			}));
+
+		dayComboBox.setModel(new DefaultComboBoxModel<>(new Integer[] {
+			    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
+			    20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+			}));
+
+		yearComboBox.setModel(new DefaultComboBoxModel<>(new Integer[] {
+			     2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035
+			}));
+		
+		saveDeadLine = new JButton("Save DeadLine");
+		saveDeadLine.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		saveDeadLine.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateDeadLine();
+			}
+		});
+		saveDeadLine.setVisible(false);
+		saveDeadLine.setBounds(499, 92, 136, 23);
+		subLayer.add(saveDeadLine);
 		
 		nextQuestion = new JButton("Next ");
 		nextQuestion.setFocusable(false);
@@ -286,6 +326,9 @@ public class DisplayOrEditQuiz extends JFrame {
 		for(MainQuiz q : masterList) {
 			if(quizName.equals(q.getName())) {
 				quizID = q.getID();
+				dayComboBox.setSelectedItem(q.getDay());
+				monthComboBox.setSelectedItem(q.getMonth());
+				yearComboBox.setSelectedItem(q.getYear());
 				setExamDuration = q.getDuration();
 				for(MainQuestion question : q.getQuestions()) {
                     if(q.getQuestions().size() > 1)
@@ -296,7 +339,9 @@ public class DisplayOrEditQuiz extends JFrame {
 				}
 			}
 		}
-		
+		checkChangeInDeadLine(yearComboBox);
+		checkChangeInDeadLine(monthComboBox);
+		checkChangeInDeadLine(dayComboBox);
 		quizName_1 = new JLabel(quizName);
 		quizName_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		quizName_1.setBounds(292, 0, 149, 39);
@@ -314,6 +359,12 @@ public class DisplayOrEditQuiz extends JFrame {
 		subLayer.add(durationButton);
 		
 		comboBoxListener(duration,durationButton);
+
+		quizName_2 = new JLabel("Dead Line");
+		quizName_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		quizName_2.setBounds(472, 0, 149, 39);
+		subLayer.add(quizName_2);
+
 
 	}
 	
@@ -559,6 +610,15 @@ public class DisplayOrEditQuiz extends JFrame {
         
 	}
 	
+	private void checkChangeInDeadLine(JComboBox<Integer> c) {
+		c.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                  saveDeadLine.setVisible(true);
+            }
+        });
+	}
+	
 	private void checkEmptyTitle(JTextField t) {
 		 t.getDocument().addDocumentListener(new DocumentListener() {
 		        @Override
@@ -772,6 +832,21 @@ public class DisplayOrEditQuiz extends JFrame {
 		
 	}
 	
+	private void updateDeadLine() {
+		int day = (int)dayComboBox.getSelectedItem();
+		int month = (int)monthComboBox.getSelectedItem();
+		int year = (int)yearComboBox.getSelectedItem();
+
+		UpdateQuiz u = new UpdateQuiz();
+		try {
+			u.updateDeadLine(quizID, year, month, day);
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		saveDeadLine.setVisible(false);
+	}
+	
 	private void updateQuiz(boolean deleteQuestion) {
 		int questionID =  questionList.get(numOfJLayeredPane).getID();
 		ArrayList<Integer> questionIDList = new ArrayList<>();
@@ -839,7 +914,7 @@ public class DisplayOrEditQuiz extends JFrame {
 		questionList.add(q);
 		
         try {
-			uploadToDatabase.uploadQuestion(quizID,Teacher_Class.classCode,quizName,questions);
+			uploadToDatabase.uploadQuestion(quizID,Teacher_Class.CLASSCODE,quizName,questions);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}

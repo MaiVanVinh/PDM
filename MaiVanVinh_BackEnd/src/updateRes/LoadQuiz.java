@@ -1,10 +1,12 @@
 package updateRes;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import connectionSQL.MyConnection;
 import uploadQaA.MainAnswer;
@@ -56,7 +58,7 @@ public class LoadQuiz {
 	
 	public void loadOnlyQuiz(String title) throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT title,exam_id,duration, course_code FROM test.exam WHERE title = '"+title+"' and course_code = ?;";
+		String query = "SELECT title,exam_id,duration, course_code,deadline FROM test.exam WHERE title = '"+title+"' and course_code = ?;";
 
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -64,8 +66,14 @@ public class LoadQuiz {
             try (ResultSet rs = stmt.executeQuery()) {
                 if(rs.next()) {
                 int id = rs.getInt("exam_id");
+                Date eventDate = rs.getDate("deadline");
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(eventDate);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int month = calendar.get(Calendar.MONTH) + 1; 
+                int year = calendar.get(Calendar.YEAR);
                 questions(id);
-                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration")));
+                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration"),day,month,year));
                 list.clear();
               }
 
@@ -80,7 +88,7 @@ public class LoadQuiz {
 	
 	public void loadQA() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver"); 
-		String query = "SELECT title, exam_id,duration, course_code FROM test.exam WHERE course_code = ?;";
+		String query = "SELECT title, exam_id,duration, course_code,deadline FROM test.exam WHERE course_code = ?;";
 		
 		try (Connection conn = MyConnection.getConnection();
 	        PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -88,9 +96,15 @@ public class LoadQuiz {
             try (ResultSet rs = stmt.executeQuery()) {
               while (rs.next()) {
                 int id = rs.getInt("exam_id");
+                Date eventDate = rs.getDate("deadline");
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(eventDate);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int month = calendar.get(Calendar.MONTH) + 1; 
+                int year = calendar.get(Calendar.YEAR);
                 duration = rs.getString("duration");
                 questions(id);
-                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),duration));
+                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),duration,day,month,year));
                 list.clear();
               }
 
@@ -165,15 +179,21 @@ public class LoadQuiz {
 	
 	public void loadStudentQuizContent() throws ClassNotFoundException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		String sql = "Select exam_id,duration, title from test.exam where course_code = '"+code+"'";
+		String sql = "Select exam_id,duration, title,deadline from test.exam where course_code = '"+code+"'";
 		
 		try (Connection conn = MyConnection.getConnection();
 		        PreparedStatement stmt = conn.prepareStatement(sql)) {
 	            try (ResultSet rs = stmt.executeQuery()) {
 	              while (rs.next()) {
 	                int id = rs.getInt("exam_id");
+	                Date eventDate = rs.getDate("deadline");
+	                Calendar calendar = Calendar.getInstance();
+	                calendar.setTime(eventDate);
+	                int day = calendar.get(Calendar.DAY_OF_MONTH);
+	                int month = calendar.get(Calendar.MONTH) + 1; 
+	                int year = calendar.get(Calendar.YEAR);
 	                questions(id);
-	                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration")));
+	                masterList.add(new MainQuiz(rs.getInt("exam_id"),rs.getString("title"),new ArrayList<>(list),rs.getString("duration"),day,month,year));
 	                list.clear();
 	              }
 
