@@ -6,6 +6,7 @@ import javax.swing.border.EmptyBorder;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 import connectionSQL.MyConnection;
+import general.MainMenu;
 import general.SignIn_Window;
 
 import javax.swing.JButton;
@@ -75,7 +76,7 @@ public class Teacher_UI{
     private String semester;
     private JButton studentList;
 
-	public Teacher_UI(SignIn_Window signin) {
+	public Teacher_UI(SignIn_Window signin,MainMenu mainmenu) {
 		
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -121,7 +122,7 @@ public class Teacher_UI{
 		
 		
 		teacher_class = new JLabel("Your course");
-		teacher_class.setBounds(10, 86, 157, 30);
+		teacher_class.setBounds(10, 97, 157, 30);
 		contentPane.add(teacher_class);
 		
 		createClass = new JButton("Create course");
@@ -198,8 +199,20 @@ public class Teacher_UI{
 				displayStudentList();
 			}
 		});
-		studentList.setBounds(10, 11, 145, 47);
+		studentList.setBounds(10, 48, 145, 38);
 		contentPane.add(studentList);
+		
+		JButton logOut = new JButton("Log out");
+		logOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame = null;
+				mainmenu.setVisible(true);
+				mainmenu.reset(0);
+			}
+		});
+		logOut.setBounds(10, 11, 89, 23);
+		contentPane.add(logOut);
 
 	}
 	
@@ -570,7 +583,5 @@ public class Teacher_UI{
 	   contentPane.setVisible(true);
 	   frame.setContentPane(contentPane);
    }
-	
-	
 }
 

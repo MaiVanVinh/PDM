@@ -104,6 +104,16 @@ public class MainMenu extends JFrame {
 
 	}
 	
+	public void reset(int i) {
+		if(i == 0) {
+		   signin = new SignIn_Window(this);
+		   signin.setVisible(false);
+		}else {
+		   register = new Register_Window(this);
+		   register.setVisible(false);
+		}
+			
+	}
 	
 	private void createNewAccount() {
 		setVisible(false);

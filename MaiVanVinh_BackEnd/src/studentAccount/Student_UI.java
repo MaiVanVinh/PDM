@@ -7,6 +7,8 @@ import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import general.MainMenu;
+
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
@@ -32,8 +34,9 @@ public class Student_UI{
 
 	private static StudentClass studentClassList;
 	private static ShowStudentQuiz showQuiz;
+	private JButton logOut;
 
-	public Student_UI() {
+	public Student_UI(MainMenu mainmenu) {
 		
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -118,6 +121,19 @@ public class Student_UI{
 		studentClassList = new StudentClass();
 		studentClassList.setLocation(2, 152);
 		contentPane.add(studentClassList);
+		
+		logOut = new JButton("Log out");
+		logOut.setBounds(10, 6, 89, 23);
+		logOut.setFocusable(false);
+		logOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Studentframe.dispose();
+				Studentframe = null;
+				mainmenu.setVisible(true);
+				mainmenu.reset(1);
+			}
+		});
+		contentPane.add(logOut);
 		
 		Studentframe.setLocationRelativeTo(null);
 	}

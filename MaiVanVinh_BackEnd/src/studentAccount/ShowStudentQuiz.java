@@ -187,7 +187,7 @@ public class ShowStudentQuiz extends JPanel {
 	private void checkStudentDoTheQuiz(String n,JLabel classCode_label) {
 		int score = -1;
 		try {
-			score = CheckStudentDoTheQuiz.checkStudentQuiz(Student_UI.STUDENT_ID, CLASS_ID, n);
+			score = CheckStudentDoTheQuiz.checkStudentQuiz(Student_UI.STUDENT_ID, CLASS_ID, n,courseCode);
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}

@@ -53,8 +53,7 @@ public class SignIn_Window extends JFrame {
     private LoadCreatedClass getCreatedClass;
     
     private Student_UI student_UI;
-    
-    
+    private MainMenu main;
 	public SignIn_Window(MainMenu mainmenu) {
 		
 		 try {
@@ -62,10 +61,9 @@ public class SignIn_Window extends JFrame {
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		 
+		this.main = mainmenu; 
 		getCreatedClass = new LoadCreatedClass();
-		teacher_UI = new Teacher_UI(this);
-		
+		teacher_UI = new Teacher_UI(this,mainmenu);
 		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 530, 353);
@@ -161,7 +159,7 @@ public class SignIn_Window extends JFrame {
 	
 	
    private void openTeacherUI() {
-	    setVisible(false);
+	    this.dispose();
 	    teacher_UI.initializeClass();
 	    Teacher_UI.frame.setVisible(true);
 	    Teacher_UI.frame.setLocationRelativeTo(null);
@@ -192,10 +190,10 @@ public class SignIn_Window extends JFrame {
    
 
    private void initializeStudentAccount() {
-		  student_UI = new Student_UI();
+		  student_UI = new Student_UI(main);
 		  student_UI.nothing();
 		  Student_UI.Studentframe.setVisible(true);
-		  setVisible(false);
+		  this.dispose();
    }
 
    private boolean checkLogin(char[] password, String selection) throws HeadlessException, ClassNotFoundException {

@@ -92,6 +92,7 @@ public class DoTheQuizPane extends JFrame {
 			e.printStackTrace();
 		}
 		
+		
 		this.quizName = quizName; 
 		this.isDone = isDone;
         this.courseCode = classCode;
